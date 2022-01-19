@@ -7,13 +7,15 @@ import threading
 class Manager:
     def __init__(self, proxy, valuesTable={}):
         self.intro = "LIVESTREAM VIEW BOT"
-        self.min = 5
+        self.min = 3
         self.max = 15
         self.run = False
         self.__objects = {
             "proxy": proxy
         }
         self.__resetValues(valuesTable)
+
+        self.PARALLEL = 35
 
     def __resetValues(self, valuesTable={}):
         self.__values = {
@@ -24,54 +26,50 @@ class Manager:
             "proxies": 0,
             "watching": 0
         }
-        self.__critical = False
+        self.__critical = 0
 
     def get(self, name):
-        while self.__critical:
-            time.sleep(random.randint(1, 5))
+        while self.__critical > self.PARALLEL:
+            time.sleep(random.randint(0, self.min))
 
         if name in self.__values.keys():
             return self.__values[name]
         return ""
 
     def increment(self, name):
-        # print("increment",self.__critical)
-        while self.__critical:
-            time.sleep(random.randint(1, 5))
+        while self.__critical > self.PARALLEL:
+            time.sleep(random.randint(0, self.min))
 
-        self.__critical = True
+        self.__critical += 1
         if name in self.__values.keys():
             self.__values[name] += 1
-        self.__critical = False
+        self.__critical -= 1
     
     def setWatching(self, value):
-        
-        while self.__critical:
-            time.sleep(random.randint(1, 5))
+        while self.__critical > self.PARALLEL:
+            time.sleep(random.randint(0, self.min))
 
-        self.__critical = True
+        self.__critical += 1
         name = 'watching'
         if name in self.__values.keys():
             self.__values[name] = value
-        self.__critical = False
+        self.__critical -= 1
 
     def decrement(self, name):
-        # print("decrement",self.__critical)
-        while self.__critical:
-            time.sleep(random.randint(1, 5))
+        while self.__critical > self.PARALLEL:
+            time.sleep(random.randint(0, self.min))
 
-        self.__critical = True
+        self.__critical += 1
         if name in self.__values.keys():
             self.__values[name] -= 1
-        self.__critical = False
+        self.__critical -= 1
 
     def criticalSection(self):
-        while self.__critical:
-            time.sleep(random.randint(1, 5))
-        self.__critical = True
-        __result = ((self.__values["threads"] * 35)
-                    // 100) > self.__values["watching"]
-        self.__critical = False
+        while self.__critical > self.PARALLEL:
+            time.sleep(random.randint(0, self.min))
+        self.__critical += 1
+        __result = ((self.__values["threads"] * self.PARALLEL) // 100) > self.__values["watching"]
+        self.__critical -= 1
         return __result
 
     def print(self, printIntro = True):
