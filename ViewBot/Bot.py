@@ -330,7 +330,8 @@ class Bot:
 
     def start(self):
         
-        for _ in range(self.__values["threads"]):
+        for i in range(self.__values["threads"]):
             if self.run == True:
                 t = Thread(target=self.spamRequests)
+                time.sleep(0.5 * (self.__values["threads"]//(i + 1)))
                 t.start()
