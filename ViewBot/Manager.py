@@ -69,18 +69,19 @@ class Manager:
         while self.__critical:
             time.sleep(random.randint(1, 5))
         self.__critical = True
-        __result = ((self.__values["threads"] * 20)
+        __result = ((self.__values["threads"] * 35)
                     // 100) > self.__values["watching"]
         self.__critical = False
         return __result
 
-    def print(self):
+    def print(self, printIntro = True):
 
         self.__values["proxies"] = self.__objects["proxy"].getProxiesCount()
 
-        print(Fore.MAGENTA + self.intro + Style.RESET_ALL + "\n")
-        print(Back.WHITE + Style.BRIGHT + Fore.LIGHTBLUE_EX +
-              f" REMAKE BY Developers@Work " + Style.RESET_ALL + "\n")
+        if printIntro:
+            print(Fore.MAGENTA + self.intro + Style.RESET_ALL + "\n")
+            print(Back.WHITE + Style.BRIGHT + Fore.LIGHTBLUE_EX +
+                f" REMAKE BY Developers@Work " + Style.RESET_ALL + "\n")
         print(Fore.WHITE + f"BOTS: "+str(self.__values["threads"])+"\n")
         print(Fore.GREEN + f"ACTIVE: "+str(self.__values["active"])+"\n")
         print(Fore.YELLOW + f"IDLE: "+str(self.__values["idle"])+"\n")

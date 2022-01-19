@@ -227,8 +227,8 @@ class Bot:
                     formatted_proxy["index"], 
                     -1
                 )
-                _t = random.randint(1, 10)
-                if formatted_proxy and self.__values['browser'] and (_t == 5 or _t == 7):
+                _t = random.randint(0, 11)
+                if formatted_proxy and self.__values['browser'] and _t % 2 == 0:
                     watching = self.__values['browser'].open(
                         request['link'], 
                         formatted_proxy["proxy"]['https'].split('//')[1]
@@ -323,6 +323,7 @@ class Bot:
 
     def spamRequests(self):
         self.__values["manager"].increment("threads")
+        self.__values["manager"].print(False)
         time.sleep(
             0.5 * (self.__values["threads"] // (self.__values["manager"].get("threads") + 1) )
         )
