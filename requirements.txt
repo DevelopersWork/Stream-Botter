@@ -6,3 +6,4 @@ requests
 urllib3
 streamlink
 selenium
+IPython

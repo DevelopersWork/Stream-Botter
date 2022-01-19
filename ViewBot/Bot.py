@@ -228,7 +228,10 @@ class Bot:
                     -1
                 )
                 if formatted_proxy and self.__values['browser']:
-                    watching = self.__values['browser'].open(request['link'], formatted_proxy['index'])
+                    watching = self.__values['browser'].open(
+                        request['link'], 
+                        formatted_proxy["proxy"]['https'].split('//')[1]
+                    )
                     self.__values["manager"].setWatching(watching)
 
             self.__values["manager"].increment("success")

@@ -7,10 +7,10 @@
 		"dockerfile": "./Dockerfile"
 	},
 	"containerEnv": { 
-		"THREADS": "500", 
-		"TOKEN": "dsPTqWl9cRU",
-		"PROXY_TYPES": "",
-		"TEMP_DIR": "/tmp"
+		"THREADS": "10", // optmimal value is 500 ~ 1000
+		"TOKEN": "", // video id
+		"PROXY_TYPES": "", // comma seperated proxy types eg. "http,socks4,socks5"
+		"TEMP_DIR": "/tmp" // temporary directory location
 	},
 	"workspaceMount": "source=${localWorkspaceFolder}/,target=/workspace,type=bind,consistency=cached", 
 	"workspaceFolder": "/workspace",
@@ -20,6 +20,6 @@
 	],
 	"shutdownAction": "none",
 	"onCreateCommand": "pip install -r requirements.txt",
-	// "postCreateCommand": "python main.py",
+	"postCreateCommand": "python main.py",
 	"hostRequirements": {"cpus": 1, "memory": "64mb"}
 }

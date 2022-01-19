@@ -31,7 +31,7 @@ class Browser:
         
         return chrome_options
 
-    def open(self, url, proxy = None):
+    def open(self, url, proxy = None, retry = 0):
         watching = 0
 
         try:
@@ -51,13 +51,13 @@ class Browser:
                 )
             )
             watching = int(element.text.split(' ')[0])
-
+            
             driver.close()
 
         except TimeoutException as te:
-            pass
+            if retry < 3: self.open(url, proxy, retry + 1)
         except Exception as e:
-            raise Exception(e)
+            pass
         
         return watching
 

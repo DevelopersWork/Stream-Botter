@@ -69,8 +69,8 @@ class Manager:
         while self.__critical:
             time.sleep(random.randint(1, 5))
         self.__critical = True
-        __result = ((self.__values["threads"] * 25)
-                    // 100) > self.__values["active"]
+        __result = ((self.__values["threads"] * 20)
+                    // 100) > self.__values["watching"]
         self.__critical = False
         return __result
 
