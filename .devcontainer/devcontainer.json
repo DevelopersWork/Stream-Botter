@@ -1,0 +1,25 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.155.1/containers/docker-existing-docker-compose
+// If you want to run as a non-root user in the container, see .devcontainer/docker-compose.yml.
+{
+	"name": "YouTube/Twitch View Bot",
+	"build": {
+		"dockerfile": "./Dockerfile"
+	},
+	"containerEnv": { 
+		"THREADS": "500", 
+		"TOKEN": "dsPTqWl9cRU",
+		"PROXY_TYPES": "",
+		"TEMP_DIR": "/tmp"
+	},
+	"workspaceMount": "source=${localWorkspaceFolder}/,target=/workspace,type=bind,consistency=cached", 
+	"workspaceFolder": "/workspace",
+	"extensions": [
+		"ms-python.python",
+		"ms-azuretools.vscode-docker"
+	],
+	"shutdownAction": "none",
+	"onCreateCommand": "pip install -r requirements.txt",
+	// "postCreateCommand": "python main.py",
+	"hostRequirements": {"cpus": 1, "memory": "64mb"}
+}

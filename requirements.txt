@@ -1,0 +1,8 @@
+colorama
+getuseragent
+pycurl
+PySocks
+requests
+urllib3
+streamlink
+selenium
