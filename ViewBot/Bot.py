@@ -105,7 +105,7 @@ class Bot:
                 url = '&'.join(url.split('\\u0026'))
 
                 viewCount = int(html.split('"viewCount":')[1].split(',')[0].strip('"'))
-                watching = 0
+                watching = 1
                 try:
                     watching = int("".join(html.split(' watching now')[0].split('\\x22')).split('text:')[-2].split('\\')[0])
                 except:
@@ -339,19 +339,21 @@ class Bot:
         self.__token = token
 
     def spamRequests(self):
+        t_id = self.__values["manager"].increment("threads")
         self.__values["manager"].increment("threads")
         time.sleep(
-            0.001 * (self.__values["threads"] // (self.__values["manager"].get("threads") + 1) )
+            0.001 * (self.__values["threads"] // (t_id + 1) )
         )
         while self.run:
-            while not self.__values["manager"].criticalSection():
+            tries = 0
+            while not self.__values["manager"].criticalSection() and tries < self.__values["manager"].PARALLEL:
+                tries += 1
                 self.__sleepThread(True)
             self.__request()
         self.__values["manager"].decrement("threads")
 
     def start(self):
-        
-        for i in range(self.__values["threads"]):
+        for _ in range(self.__values["threads"]):
             if self.run == True:
                 t = Thread(target=self.spamRequests)
                 t.start()
