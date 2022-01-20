@@ -5,6 +5,7 @@ import random
 
 
 class Manager:
+
     def __init__(self, proxy, valuesTable={}):
         colorama.init(autoreset=True)
         self.intro = "LIVESTREAM VIEW BOT"
@@ -14,9 +15,9 @@ class Manager:
         self.__objects = {
             "proxy": proxy
         }
-        self.__resetValues(valuesTable)
-
         self.PARALLEL = 35
+        self.__queue = [[] for _ in range(self.PARALLEL)]
+        self.__resetValues(valuesTable)
 
     def __resetValues(self, valuesTable={}):
         self.__values = {
@@ -28,10 +29,11 @@ class Manager:
             "watching": 1,
             'views': 1,
         }
-        self.__critical = False
+        self.__critical = [False for _ in range(self.PARALLEL)]
+        self.__critical.append(False)
 
     def get(self, name):
-        while self.__critical:
+        while self.__critical[-1]:
             time.sleep(random.randint(1, self.min))
 
         if name in self.__values.keys():
@@ -39,39 +41,48 @@ class Manager:
         return ""
 
     def increment(self, name):
-        while self.__critical:
+        while self.__critical[-1]:
             time.sleep(random.randint(1, self.min))
 
-        self.__critical = True
+        self.__critical[-1] = True
         if name in self.__values.keys():
             self.__values[name] += 1
-        self.__critical = False
+        self.__critical[-1] = False
     
     def set(self, name, value):
-        while self.__critical:
+        while self.__critical[-1]:
             time.sleep(random.randint(1, self.min))
 
-        self.__critical = True
+        self.__critical[-1] = True
         if name in self.__values.keys():
             self.__values[name] = value
-        self.__critical = False
+        self.__critical[-1] = False
 
     def decrement(self, name):
-        while self.__critical:
+        while self.__critical[-1]:
             time.sleep(random.randint(1, self.min))
 
-        self.__critical = True
+        self.__critical[-1] = True
         if name in self.__values.keys():
             self.__values[name] -= 1
-        self.__critical = False
+        self.__critical[-1] = False
 
     def criticalSection(self):
-        while self.__critical:
+        p_id = random.randint(0, self.PARALLEL - 1)
+        t_id = time.time() * 1000
+
+        self.__queue[p_id].append(t_id)
+        while self.__critical[p_id] and self.__queue[p_id][0] != t_id:
             time.sleep(random.randint(1, self.min))
-        self.__critical = True
+
+        self.__critical[p_id] = True
+
         __result = ((self.__values["threads"] * self.PARALLEL) // 100) > self.__values["watching"]
         __result = __result or ((self.__values["threads"] * self.PARALLEL) // 100) > self.__values["active"]
-        self.__critical = False
+
+        self.__queue[p_id].pop(0)
+        self.__critical[p_id] = False
+
         return __result
 
     def print(self, printIntro = True):

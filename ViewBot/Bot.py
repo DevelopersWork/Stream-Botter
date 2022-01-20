@@ -16,7 +16,7 @@ import traceback
 from urllib.parse import urlparse, parse_qs
 import string
 
-TIMEOUT = (5, 30)
+TIMEOUT = (3, 60)
 RETRIES = 3
 YT_HEAD_URL = """https://s.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=isWmmj2C9Y2vULKF&docid={0}&ver=2&cmt=7334&ei={1}&fmt=133&fs=0&rt=1003&of={2}&euri&lact=4418&live=dvr&cl={3}&state=playing&vm={4}&volume={5}&c=MWEB&cver=2.20200313.03.00&cplayer=UNIPLAYER&cbrand=apple&cbr=Safari%20Mobile&cbrver=12.1.15E148&cmodel=iphone&cos=iPhone&cosver=12_2&cplatform=MOBILE&delay=5&hl=ru&cr=GB&rtn=1303&afmt=140&lio=1556394045.182&idpj=&ldpj=&rti=1003&muted=0&st=7334&et=7634"""
 
@@ -339,15 +339,15 @@ class Bot:
         self.__token = token
 
     def spamRequests(self):
-        t_id = self.__values["manager"].increment("threads")
+        t_id = self.__values["manager"].get("threads")
         self.__values["manager"].increment("threads")
+
         time.sleep(
             0.001 * (self.__values["threads"] // (t_id + 1) )
         )
+        
         while self.run:
-            tries = 0
-            while not self.__values["manager"].criticalSection() and tries < self.__values["manager"].PARALLEL:
-                tries += 1
+            while not self.__values["manager"].criticalSection():
                 self.__sleepThread(True)
             self.__request()
         self.__values["manager"].decrement("threads")

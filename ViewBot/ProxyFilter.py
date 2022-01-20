@@ -62,7 +62,7 @@ class ProxyFilter:
 
     def checkProxy(self, proxy, **kwargs):
 
-        if not self.sendQuery(proxy=proxy, url="https://www.youtube.com/watch?v=NLdkkpMrZIY"):
+        if not self.sendQuery(proxy=proxy, url="https://youtu.be/oRdxUFDoQe0?t=60"):
             self.__dead.append(proxy)
             return False
         return True
@@ -74,6 +74,7 @@ class ProxyFilter:
         with open(self.__location, 'r') as file:
             data = set(file.read().split("\n"))
             for proxy in data:
+                if proxy.split(':') != 2: continue
                 t = Thread(target=self.checkProxy, args=(proxy,))
                 self.__threads.append(t)
                 t.start()

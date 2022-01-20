@@ -133,6 +133,9 @@ class Proxy:
                     set(self.__proxies[proxyType]) - set(self.__dead))
 
     def __deadProxy(self, proxy):
+
+        if len(proxy.split(':')) != 2: return
+
         self.__dead.append(proxy)
         
         proxyType = "dead"
