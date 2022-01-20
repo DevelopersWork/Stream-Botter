@@ -151,7 +151,7 @@ class Proxy:
         if proxy in self.__dead and loop < len(self.__proxies[proxyType]):
             return self.getRandomProxy(loop+1)
 
-        return {"proxy": self.__formatProxy(proxy, proxyType), "index": proxy}
+        return {"proxy": self.__formatProxy(proxy, proxyType), "index": proxy, 'type': proxyType}
 
     def setProxyFailure(self, proxy, priority=0):
         while self.__critical:

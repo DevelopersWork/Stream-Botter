@@ -47,7 +47,6 @@ manager.intro = intro
 browser = Browser()
 bot = Bot(proxy, manager, browser)
 proxy_filter = ProxyFilter(proxy)
-manager.print()
 
 try:
     threads = int(threads)
@@ -59,9 +58,10 @@ if __name__ == '__main__':
     bot.setBot(token)
     bot.setThreads(threads)
     bot.start()
+    manager.print()
 
     while manager.get('active') or manager.get('idle'):
-        manager.print()
-        time.sleep(random.randint(5,30))
+        manager.print(False)
+        time.sleep(random.randint(3,15))
         clear_output(wait=True)
         pass

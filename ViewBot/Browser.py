@@ -1,8 +1,4 @@
-from time import sleep
-from random import randint
-
 from selenium import webdriver
-
 from selenium.webdriver.chrome.options import Options
 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -19,19 +15,29 @@ class Browser:
         """Sets chrome options for Selenium.
         Chrome options for headless browser is enabled.
         """
+        
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+        
         if proxy:
             chrome_options.add_argument("--proxy-server={0}".format(proxy))
+        
         chrome_prefs = {}
-        chrome_options.experimental_options["prefs"] = chrome_prefs
         chrome_prefs["profile.default_content_settings"] = {"images": 2}
+        chrome_options.experimental_options["prefs"] = chrome_prefs
+
+        mobile_emulation = {
+            "deviceMetrics": { "width": 375, "height": 812, "pixelRatio": 3.0 },
+            "userAgent": "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+        }
+        chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+        
         
         return chrome_options
 
-    def open(self, url, proxy = None, retry = 0):
+    def open(self, url, proxy = None, proxyType = None, retry = 0):
         watching = 0
 
         try:
@@ -42,7 +48,7 @@ class Browser:
             
             # Do stuff with your driver
             driver.get(url)
-            element = WebDriverWait(driver, 300).until(
+            element = WebDriverWait(driver, 60).until(
                 EC.presence_of_element_located(
                     (
                         By.XPATH, 
@@ -55,9 +61,10 @@ class Browser:
             driver.close()
 
         except TimeoutException as te:
-            if retry < 3: self.open(url, proxy, retry + 1)
+            if retry < 3: self.open(url, proxy, proxyType, retry + 1)
+            return -1
         except Exception as e:
-            pass
+            return -1
         
         return watching
 

@@ -1,11 +1,12 @@
+import colorama
 from colorama import Fore, init, Style, Back
 import time
 import random
-import threading
 
 
 class Manager:
     def __init__(self, proxy, valuesTable={}):
+        colorama.init(autoreset=True)
         self.intro = "LIVESTREAM VIEW BOT"
         self.min = 3
         self.max = 15
@@ -24,52 +25,53 @@ class Manager:
             "active": 0,
             "success": 0,
             "proxies": 0,
-            "watching": 0
+            "watching": 0,
+            'views': 0,
         }
-        self.__critical = 0
+        self.__critical = False
 
     def get(self, name):
-        while self.__critical > self.PARALLEL:
-            time.sleep(random.randint(0, self.min))
+        while self.__critical:
+            time.sleep(random.randint(1, self.min))
 
         if name in self.__values.keys():
             return self.__values[name]
         return ""
 
     def increment(self, name):
-        while self.__critical > self.PARALLEL:
-            time.sleep(random.randint(0, self.min))
+        while self.__critical:
+            time.sleep(random.randint(1, self.min))
 
-        self.__critical += 1
+        self.__critical = True
         if name in self.__values.keys():
             self.__values[name] += 1
-        self.__critical -= 1
+        self.__critical = False
     
-    def setWatching(self, value):
-        while self.__critical > self.PARALLEL:
-            time.sleep(random.randint(0, self.min))
+    def set(self, name, value):
+        while self.__critical:
+            time.sleep(random.randint(1, self.min))
 
-        self.__critical += 1
-        name = 'watching'
+        self.__critical = True
         if name in self.__values.keys():
             self.__values[name] = value
-        self.__critical -= 1
+        self.__critical = False
 
     def decrement(self, name):
-        while self.__critical > self.PARALLEL:
-            time.sleep(random.randint(0, self.min))
+        while self.__critical:
+            time.sleep(random.randint(1, self.min))
 
-        self.__critical += 1
+        self.__critical = True
         if name in self.__values.keys():
             self.__values[name] -= 1
-        self.__critical -= 1
+        self.__critical = False
 
     def criticalSection(self):
-        while self.__critical > self.PARALLEL:
-            time.sleep(random.randint(0, self.min))
-        self.__critical += 1
+        while self.__critical:
+            time.sleep(random.randint(1, self.min))
+        self.__critical = True
         __result = ((self.__values["threads"] * self.PARALLEL) // 100) > self.__values["watching"]
-        self.__critical -= 1
+        __result = __result or ((self.__values["threads"] * self.PARALLEL * 2) // 100) > self.__values["active"]
+        self.__critical = False
         return __result
 
     def print(self, printIntro = True):
@@ -86,12 +88,8 @@ class Manager:
         print(Fore.CYAN + f"SUCCESS: "+str(self.__values["success"])+"\n")
         print(Fore.RED + f"PROXIES: "+str(self.__values["proxies"])+"\n")
         print(Fore.BLUE + f"WATCHING: "+str(self.__values["watching"])+"\n")
+        print(Fore.GREEN + f"VIEWS: "+str(self.__values["views"])+"\n")
         print(Style.RESET_ALL)
-
-    def printService(self):
-        while self.run:
-            self.print()
-            time.sleep(random.random(self.min, self.max))
 
 
 "Manager"

@@ -99,9 +99,17 @@ class Bot:
                     raise Exception('SERVER DOWN OR WHAT')
 
                 html = response.text
+
                 url = html.split('baseUrl')[3].split('"')[2]
                 url = url.replace('%2C', ',').replace("\/", '/')
                 url = '&'.join(url.split('\\u0026'))
+
+                viewCount = int(html.split('"viewCount":')[1].split(',')[0].strip('"'))
+                watching = 0
+                try:
+                    watching = int("".join(html.split(' watching now')[0].split('\\x22')).split('text:')[-2].split('\\')[0])
+                except:
+                    pass
 
                 parsed_url = urlparse(url)
                 params = parse_qs(parsed_url.query)
@@ -154,7 +162,9 @@ class Bot:
                     # 'url': self.__getUrl(args),
                     'headers': header,
                     'proxies': proxy,
-                    'link': __url
+                    'link': __url,
+                    'viewCount': viewCount,
+                    'watching': watching
                 }
             except Exception as e:
                 raise Exception(e)
@@ -204,7 +214,7 @@ class Bot:
             now = datetime.datetime.utcnow()
             start = now - origin
 
-            time.sleep(random.randint(1, 5))
+            self.__sleepThread()
 
             now = datetime.datetime.utcnow() - origin
 
@@ -222,24 +232,20 @@ class Bot:
                 timeout=TIMEOUT
             )
 
+            self.__values["manager"].set('views', request['viewCount'])
+            self.__values["manager"].set('watching', request['watching'])
+
             if self.__values["proxy"] != None:
                 self.__values["proxy"].setProxyFailure(
                     formatted_proxy["index"], 
                     -1
                 )
-                _t = random.randint(0, 11)
-                if formatted_proxy and self.__values['browser'] and _t % 2 == 0:
-                    watching = self.__values['browser'].open(
-                        request['link'], 
-                        formatted_proxy["proxy"]['https'].split('//')[1]
-                    )
-                    self.__values["manager"].setWatching(watching)
 
             self.__values["manager"].increment("success")
             self.__values["manager"].decrement("active")
             active = 0
 
-            time.sleep(random.randint(90, 300))
+            self.__sleepThread()
 
             return True
 
@@ -256,7 +262,7 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 5)
             else:
                 self.__saveLog(msg)
-            time.sleep(random.randint(5, 30))
+            self.__sleepThread(True)
 
         except (
             requests.exceptions.ChunkedEncodingError,
@@ -271,7 +277,7 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 2)
             else:
                 self.__saveLog(msg)
-            time.sleep(random.randint(5, 30))
+            self.__sleepThread(True)
 
         except Exception as e:
             msg = e
@@ -282,7 +288,7 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 1)
             else:
                 self.__saveLog(msg)
-            time.sleep(random.randint(5, 30))
+            self.__sleepThread(True)
 
         finally:
 
@@ -293,6 +299,17 @@ class Bot:
                 self.__values["manager"].decrement("idle")
 
         return False
+    
+    def __sleepThread(self, failed = False):
+        mx = self.__values["threads"] // 100
+
+        if failed:
+            mx *= 3
+
+        mn = mx // 10
+
+        time.sleep(random.randint(mn, mx))
+
 
     def __saveLog(self, message, head="BOT"):
 
@@ -323,13 +340,12 @@ class Bot:
 
     def spamRequests(self):
         self.__values["manager"].increment("threads")
-        self.__values["manager"].print(False)
         time.sleep(
             0.5 * (self.__values["threads"] // (self.__values["manager"].get("threads") + 1) )
         )
         while self.run:
             while not self.__values["manager"].criticalSection():
-                time.sleep(random.randint(1, 8))
+                self.__sleepThread(True)
             self.__request()
         self.__values["manager"].decrement("threads")
 
