@@ -228,12 +228,12 @@ class Bot:
                 timeout=TIMEOUT
             )
 
-            if self.__values["browser"]:
-                self.__values["browser"].open(
-                    __url, 
-                    formatted_proxy['proxy']['https'], 
-                    formatted_proxy['type']
-                )
+            # if self.__values["browser"]:
+            #     self.__values["browser"].open(
+            #         __url, 
+            #         formatted_proxy['proxy']['https'], 
+            #         formatted_proxy['type']
+            #     )
 
             self.__values["manager"].set('views', request['viewCount'])
             self.__values["manager"].set('watching', request['watching'])
