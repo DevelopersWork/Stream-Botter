@@ -29,7 +29,7 @@ class Proxy:
             "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks5"
         ],
         "dead": [
-            "https://docs.google.com/uc?export=download&id=1n27MHFgoNoIErFJw5qOnZrscwGNBucnL"
+            "https://gist.githubusercontent.com/DevelopersWork/36d20d90d0bcc8a2db995d7415e254a6/raw/597571ebf26a79b888c19385e072a8fd13a450fc/Not%2520Public%2520Proxies"
         ]
     }
 

@@ -25,8 +25,8 @@ class Manager:
             "active": 0,
             "success": 0,
             "proxies": 0,
-            "watching": 0,
-            'views': 0,
+            "watching": 1,
+            'views': 1,
         }
         self.__critical = False
 
@@ -70,7 +70,7 @@ class Manager:
             time.sleep(random.randint(1, self.min))
         self.__critical = True
         __result = ((self.__values["threads"] * self.PARALLEL) // 100) > self.__values["watching"]
-        __result = __result or ((self.__values["threads"] * self.PARALLEL * 2) // 100) > self.__values["active"]
+        __result = __result or ((self.__values["threads"] * self.PARALLEL) // 100) > self.__values["active"]
         self.__critical = False
         return __result
 
