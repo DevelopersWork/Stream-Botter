@@ -341,7 +341,7 @@ class Bot:
     def spamRequests(self):
         self.__values["manager"].increment("threads")
         time.sleep(
-            0.5 * (self.__values["threads"] // (self.__values["manager"].get("threads") + 1) )
+            0.001 * (self.__values["threads"] // (self.__values["manager"].get("threads") + 1) )
         )
         while self.run:
             while not self.__values["manager"].criticalSection():
