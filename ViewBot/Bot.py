@@ -301,7 +301,7 @@ class Bot:
         return False
     
     def __sleepThread(self, failed = False):
-        mx = self.__values["threads"] // 100
+        mx = self.__values["threads"] // 10
 
         if failed:
             mx *= 3
@@ -345,7 +345,7 @@ class Bot:
         time.sleep(
             0.001 * (self.__values["threads"] // (t_id + 1) )
         )
-        
+
         while self.run:
             while not self.__values["manager"].criticalSection():
                 self.__sleepThread(True)
