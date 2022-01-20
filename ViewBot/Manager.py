@@ -16,7 +16,7 @@ class Manager:
             "proxy": proxy
         }
         self.PARALLEL = 35
-        self.__queue = [[] for _ in range(self.PARALLEL)]
+        self.__queue = [[] for _ in range(self.PARALLEL//2)]
         self.__resetValues(valuesTable)
 
     def __resetValues(self, valuesTable={}):
@@ -29,7 +29,7 @@ class Manager:
             "watching": 1,
             'views': 1,
         }
-        self.__critical = [False for _ in range(self.PARALLEL)]
+        self.__critical = [False for _ in range(self.PARALLEL//2)]
         self.__critical.append(False)
 
     def get(self, name):
@@ -68,7 +68,7 @@ class Manager:
         self.__critical[-1] = False
 
     def criticalSection(self):
-        p_id = random.randint(0, self.PARALLEL - 1)
+        p_id = random.randint(0, (self.PARALLEL//2) - 1)
         t_id = time.time() * 1000
 
         self.__queue[p_id].append(t_id)
