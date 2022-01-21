@@ -48,7 +48,7 @@ class Browser:
             
             # Do stuff with your driver
             driver.get(url)
-            element = WebDriverWait(driver, 300).until(
+            element = WebDriverWait(driver, 60).until(
                 EC.presence_of_element_located(
                     (
                         By.XPATH, 
