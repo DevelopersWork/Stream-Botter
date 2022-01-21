@@ -305,10 +305,10 @@ class Bot:
     
     def __sleepThread(self, mn = None, mx = None, failed = False):
         if not mx:
-            mx = (self.__values["threads"] // 10) * 6
+            mx = (self.__values["threads"] // 10) * 3
 
         if failed:
-            mx *= 2
+            mx *= 1.3
 
         if not mn:
             mn = (self.__values["manager"].get("active") // 10) % 6
