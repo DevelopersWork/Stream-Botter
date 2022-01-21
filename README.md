@@ -28,29 +28,29 @@ While the documentation for the [Stream Botter](https://github.com/DevelopersWor
 
 ## FAQ
   
-  **Q:** Will this increase views on my youtube or twitch video?
+  **Q:** Will this increase views on any [YouTube](https://youtube.com/developerswork) or [Twitch](https://twitch.tv/developerswork) video?
 
   **A:** Nope, you will not get any views out of this. 
   
-  **Q:** Does this help the video to get more viewers or promote?
+  **Q:** Does this help the video to get more viewers or get promoted on the platform?
   
-  **A:** Nope, it doesnt get you any better. 
+  **A:** Nope, just try to make content better. 
 
   **Q:** Is this legal to do!
   
-  **A:** Nope, we are not sure where the mention. But abusing any system's functionality is wrong, so this would too. 
+  **A:** Nope, we are not sure. But abusing any system's functionality is offensive. 
 
   **Q:** What do we use it for?
   
   **A:** Either for educational or entertainment only. 
 
-  **Q:** Will there be any issues if I run this.
+  **Q:** Will there be any issues if I run this on my regular system.
   
-  **A:** Yep and Nope. As long as you know what you are doing its should be okay.
+  **A:** Yep and Nope. As long as you know what you are doing it should be okay.
 
   **Q:** Will my internet usage effected?
   
-  **A:** Yes it does, spamming so http requests will surely effect your internet usage
+  **A:** Yes it does, spamming http requests will surely effect your internet usage
 
 ## Contributers
 - Base: https://github.com/KevinLage/YouTube-Livestream-Botter
