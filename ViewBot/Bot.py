@@ -304,12 +304,12 @@ class Bot:
         return False
     
     def __sleepThread(self, failed = False):
-        mx = self.__values["threads"] // 10
+        mx = (self.__values["threads"] // 10) * 18
 
         if failed:
-            mx *= 3
+            mx *= 2
 
-        mn = mx // 10
+        mn = self.__values["manager"].get("active") // 10
 
         time.sleep(random.randint(mn, mx))
 

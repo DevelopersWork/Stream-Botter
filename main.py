@@ -3,6 +3,7 @@ import sys
 import time
 import random
 from IPython.display import clear_output
+from ViewBot.Browser import Browser
 
 args = {'PROXY_TYPES': None, 'TEMP_DIR': None, 'THREADS': None, 'TOKEN': None}
 # parsing cmd args
@@ -26,7 +27,7 @@ from ViewBot.Manager import Manager
 from ViewBot.Proxy import Proxy
 from ViewBot.Bot import Bot
 from ViewBot.ProxyFilter import ProxyFilter
-from ViewBot.Browser import Browser
+# from ViewBot.Browser import Browser
 
 
 intro = """
@@ -44,7 +45,8 @@ intro = """
 proxy = Proxy(types)
 manager = Manager(proxy)
 manager.intro = intro
-browser = Browser()
+browser = None
+# browser = Browser() # Required when only selinum is needed
 bot = Bot(proxy, manager, browser)
 proxy_filter = ProxyFilter(proxy)
 
