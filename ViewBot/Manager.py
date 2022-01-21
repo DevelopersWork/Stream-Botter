@@ -15,8 +15,8 @@ class Manager:
         self.__objects = {
             "proxy": proxy
         }
-        self.PARALLEL = 35
-        self.__queue = [[] for _ in range(self.PARALLEL//2)]
+        self.PARALLEL = 36
+        self.__queue = [[] for _ in range(self.PARALLEL//8)]
         self.__resetValues(valuesTable)
 
     def __resetValues(self, valuesTable={}):
@@ -29,7 +29,7 @@ class Manager:
             "watching": 1,
             'views': 1,
         }
-        self.__critical = [False for _ in range(self.PARALLEL//2)]
+        self.__critical = [False for _ in range(self.PARALLEL//8)]
         self.__critical.append(False)
 
     def get(self, name):
@@ -68,7 +68,7 @@ class Manager:
         self.__critical[-1] = False
 
     def criticalSection(self):
-        p_id = random.randint(0, (self.PARALLEL//2) - 1)
+        p_id = random.randint(0, (self.PARALLEL//8) - 1)
         t_id = time.time() * 1000
 
         self.__queue[p_id].append(t_id)
@@ -77,8 +77,8 @@ class Manager:
 
         self.__critical[p_id] = True
 
-        __result = ((self.__values["threads"] * self.PARALLEL) // 100) > self.__values["watching"]
-        __result = __result or ((self.__values["threads"] * self.PARALLEL) // 100) > self.__values["active"]
+        __result = ((self.__values["threads"] * self.PARALLEL) // 500) > self.__values["watching"]
+        __result = __result or ((self.__values["threads"] * self.PARALLEL) // 200) > self.__values["active"]
 
         self.__queue[p_id].pop(0)
         self.__critical[p_id] = False
