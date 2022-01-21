@@ -31,23 +31,22 @@ class Manager:
         }
         self.__critical = [False for _ in range(self.PARALLEL//8)]
         self.__critical.append(False)
+        self.__critical.append(False)
+        self.__critical.append(False)
 
     def get(self, name):
-        while self.__critical[-1]:
-            time.sleep(random.randint(1, self.min))
-
         if name in self.__values.keys():
             return self.__values[name]
         return ""
 
     def increment(self, name):
-        while self.__critical[-1]:
+        while self.__critical[-2]:
             time.sleep(random.randint(1, self.min))
 
-        self.__critical[-1] = True
+        self.__critical[-2] = True
         if name in self.__values.keys():
             self.__values[name] += 1
-        self.__critical[-1] = False
+        self.__critical[-2] = False
     
     def set(self, name, value):
         while self.__critical[-1]:
@@ -59,13 +58,13 @@ class Manager:
         self.__critical[-1] = False
 
     def decrement(self, name):
-        while self.__critical[-1]:
+        while self.__critical[-2]:
             time.sleep(random.randint(1, self.min))
 
-        self.__critical[-1] = True
+        self.__critical[-2] = True
         if name in self.__values.keys():
             self.__values[name] -= 1
-        self.__critical[-1] = False
+        self.__critical[-2] = False
 
     def criticalSection(self):
         p_id = random.randint(0, (self.PARALLEL//8) - 1)
