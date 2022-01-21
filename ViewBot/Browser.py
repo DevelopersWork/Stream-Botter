@@ -48,7 +48,7 @@ class Browser:
             
             # Do stuff with your driver
             driver.get(url)
-            element = WebDriverWait(driver, 180).until(
+            element = WebDriverWait(driver, 300).until(
                 EC.presence_of_element_located(
                     (
                         By.XPATH, 
@@ -61,7 +61,7 @@ class Browser:
             driver.close()
 
         except TimeoutException as te:
-            if retry < 3: self.open(url, proxy, proxyType, retry + 1)
+            if retry < 3: return self.open(url, proxy, proxyType, retry + 1)
             pass
         except Exception as e:
             pass
