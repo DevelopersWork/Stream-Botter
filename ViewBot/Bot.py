@@ -210,7 +210,7 @@ class Bot:
             now = datetime.datetime.utcnow()
             start = now - origin
 
-            self.__sleepThread()
+            self.__sleepThread(mn=18, mx=60)
 
             now = datetime.datetime.utcnow() - origin
 
@@ -265,7 +265,7 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 5)
             else:
                 self.__saveLog(msg)
-            self.__sleepThread(True)
+            self.__sleepThread(failed = True)
 
         except (
             requests.exceptions.ChunkedEncodingError,
@@ -280,7 +280,7 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 2)
             else:
                 self.__saveLog(msg)
-            self.__sleepThread(True)
+            self.__sleepThread(failed = True)
 
         except Exception as e:
             msg = e
@@ -291,7 +291,7 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 1)
             else:
                 self.__saveLog(msg)
-            self.__sleepThread(True)
+            self.__sleepThread(failed = True)
 
         finally:
 
@@ -303,13 +303,15 @@ class Bot:
 
         return False
     
-    def __sleepThread(self, failed = False):
-        mx = (self.__values["threads"] // 10) * 6
+    def __sleepThread(self, mn = None, mx = None, failed = False):
+        if not mx:
+            mx = (self.__values["threads"] // 10) * 6
 
         if failed:
             mx *= 2
 
-        mn = (self.__values["manager"].get("active") // 10) % 6
+        if not mn:
+            mn = (self.__values["manager"].get("active") // 10) % 6
 
         time.sleep(random.randint(mn, mx))
 
@@ -351,7 +353,7 @@ class Bot:
 
         while self.run:
             while not self.__values["manager"].criticalSection():
-                self.__sleepThread(True)
+                self.__sleepThread(failed = True)
             self.__request()
         self.__values["manager"].decrement("threads")
 

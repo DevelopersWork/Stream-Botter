@@ -76,8 +76,8 @@ class Manager:
 
         self.__critical[p_id] = True
 
-        __result = ((self.__values["threads"] * self.PARALLEL) // 500) > self.__values["watching"]
-        __result = __result or ((self.__values["threads"] * self.PARALLEL) // 200) > self.__values["active"]
+        __result = (self.__values["watching"] * 7) < self.__values["threads"]
+        __result = __result or ((self.__values["active"] * 3) < self.__values["idle"])
 
         self.__queue[p_id].pop(0)
         self.__critical[p_id] = False
