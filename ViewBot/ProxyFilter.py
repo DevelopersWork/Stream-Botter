@@ -75,6 +75,7 @@ class ProxyFilter:
             data = set(file.read().split("\n"))
             for proxy in data:
                 if len(proxy.split(':')) != 2: continue
+                if len(proxy.split('.')) != 4: continue
                 t = Thread(target=self.checkProxy, args=(proxy,))
                 self.__threads.append(t)
                 t.start()
