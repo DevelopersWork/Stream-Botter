@@ -104,8 +104,12 @@ class Bot:
                 url = url.replace('%2C', ',').replace("\/", '/')
                 url = '&'.join(url.split('\\u0026'))
 
-                viewCount = int(html.split('"viewCount":')[1].split(',')[0].strip('"'))
-                watching = int("".join(html.split(' watching now')[0].split('\\x22')).split('text:')[-2].split('\\')[0])
+                try:
+                    viewCount = int(html.split('"viewCount":')[1].split(',')[0].strip('"'))
+                    watching = int("".join(html.split(' watching now')[0].split('\\x22')).split('text:')[-2].split('\\')[0])
+                except Exception as e:
+                    viewCount = 1
+                    watching = 1
 
                 parsed_url = urlparse(url)
                 params = parse_qs(parsed_url.query)
