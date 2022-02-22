@@ -3,13 +3,18 @@ import sys
 import time
 import random
 from IPython.display import clear_output
-from ViewBot.Browser import Browser
+# from ViewBot.Browser import Browser
 
-args = {'PROXY_TYPES': None, 'TEMP_DIR': None, 'THREADS': None, 'TOKEN': None}
+# python main.py threads <video_id>
+
+args = {'THREADS': None, 'TOKEN': None, 'PROXY_TYPES': None, 'TEMP_DIR': None}
 # parsing cmd args
-for i in sys.argv[1::]:
-    arg = i.split('=')
-    args[arg[0].upper()] = "=".join(arg[1:])
+for i in range(len(sys.argv[1::])):
+    arg = sys.argv[i + 1].split('=')
+    if len(arg) == 2:
+        args[arg[0].upper()] = "=".join(arg[1:])
+    else:
+        args[list(args.keys())[i]] = sys.argv[i + 1]
 
 types = os.environ.get('PROXY_TYPES').split(',') if os.environ.get('PROXY_TYPES') else [] # ["http"]
 types = args['PROXY_TYPES'].split(',') if args['PROXY_TYPES'] else types
@@ -54,6 +59,8 @@ try:
     threads = int(threads)
 except:
     threads = 0
+
+clear_output(wait=True)
 
 if __name__ == '__main__':
     bot.run = True
