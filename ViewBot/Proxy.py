@@ -12,20 +12,28 @@ class Proxy:
             "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=10000&anonymity=elite",
             "https://www.proxy-list.download/api/v1/get?type=https&anon=elite",
             "https://www.proxy-list.download/api/v1/get?type=http&anon=elite",
-            "https://sunny9577.github.io/proxy-scraper/proxies.txt"
+            "https://sunny9577.github.io/proxy-scraper/proxies.txt",
             "http://pubproxy.com/api/proxy?limit=-1&format=txt&http=true&type=http",
-            "https://raw.githubusercontent.com/Agantor/viewerbot/master/Proxies_txt/good_proxy.txt"
+            "https://raw.githubusercontent.com/Agantor/viewerbot/master/Proxies_txt/good_proxy.txt",
+            "https://raw.githubusercontent.com/aslisk/proxyhttps/main/https.txt",
+            "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt",
+            "https://raw.githubusercontent.com/roosterkid/openproxylist/main/HTTPS_RAW.txt",
+            "https://raw.githubusercontent.com/mmpx12/proxy-list/master/https.txt"
         ],
         "socks4": [
             "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/socks4.txt",
             "https://api.proxyscrape.com/?request=getproxies&proxytype=socks4&timeout=10000",
-            "https://www.proxy-list.download/api/v1/get?type=socks4&anon=elite"
-            "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks4"
+            "https://www.proxy-list.download/api/v1/get?type=socks4&anon=elite",
+            "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks4",
+            "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/socks4.txt",
+            "https://raw.githubusercontent.com/mmpx12/proxy-list/master/socks4.txt",
+            "https://raw.githubusercontent.com/zeynoxwashere/proxy-list/main/socks4.txt",
+            "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/socks4.txt"
         ],
         "socks5": [
             "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/socks5.txt",
             "https://api.proxyscrape.com/?request=getproxies&proxytype=socks5&timeout=10000",
-            "https://www.proxy-list.download/api/v1/get?type=socks5&anon=elite"
+            "https://www.proxy-list.download/api/v1/get?type=socks5&anon=elite",
             "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks5"
         ],
         "dead": [
