@@ -8,6 +8,12 @@ class Proxy:
 
     __source = {
         "http": [
+            "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=10000&anonymity=elite",
+            "https://www.proxy-list.download/api/v1/get?type=https&anon=elite",
+            "https://www.proxy-list.download/api/v1/get?type=http&anon=elite",
+            "http://pubproxy.com/api/proxy?limit=-1&format=txt&http=true&type=http"
+        ],
+        "old_http": [
             "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
             "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=10000&anonymity=elite",
             "https://www.proxy-list.download/api/v1/get?type=https&anon=elite",
@@ -21,6 +27,12 @@ class Proxy:
             "https://raw.githubusercontent.com/mmpx12/proxy-list/master/https.txt"
         ],
         "socks4": [
+            "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/socks4.txt",
+            "https://api.proxyscrape.com/?request=getproxies&proxytype=socks4&timeout=10000",
+            "https://www.proxy-list.download/api/v1/get?type=socks4&anon=elite",
+            "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks4"
+        ],
+        "old_socks4": [
             "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/socks4.txt",
             "https://api.proxyscrape.com/?request=getproxies&proxytype=socks4&timeout=10000",
             "https://www.proxy-list.download/api/v1/get?type=socks4&anon=elite",
