@@ -3,33 +3,37 @@ from colorama import Fore, init, Style, Back
 import time
 import random
 
+CONSTANT = 6
 
 class Manager:
 
-    def __init__(self, proxy, valuesTable={}):
+    def __init__(self, proxy, speed, valuesTable={}):
         colorama.init(autoreset=True)
         self.intro = "LIVESTREAM VIEW BOT"
-        self.min = 3
-        self.max = 15
+        self.min = (3 - speed) if speed < 3 else 0
+        self.max = (15 - speed) + 1
         self.run = False
         self.__objects = {
             "proxy": proxy
         }
-        self.PARALLEL = 36
-        self.__queue = [[] for _ in range(self.PARALLEL//8)]
+        self.PARALLEL = CONSTANT * speed
+        self.__queue = [[] for _ in range(self.PARALLEL // CONSTANT)]
         self.__resetValues(valuesTable)
+
+        self.speed = speed
 
     def __resetValues(self, valuesTable={}):
         self.__values = {
             "threads": 0,
-            "idle": 0,
+            "request": 0,
             "active": 0,
             "success": 0,
             "proxies": 0,
+            'idle': 0,
             "watching": 1,
             'views': 1,
         }
-        self.__critical = [False for _ in range(self.PARALLEL//8)]
+        self.__critical = [False for _ in range(self.PARALLEL//CONSTANT)]
         self.__critical.append(False)
         self.__critical.append(False)
         self.__critical.append(False)
@@ -41,7 +45,7 @@ class Manager:
 
     def increment(self, name):
         while self.__critical[-2]:
-            time.sleep(random.randint(1, self.min))
+            time.sleep(random.randint(self.min, self.max))
 
         self.__critical[-2] = True
         if name in self.__values.keys():
@@ -50,7 +54,7 @@ class Manager:
     
     def set(self, name, value):
         while self.__critical[-1]:
-            time.sleep(random.randint(1, self.min))
+            time.sleep(random.randint(self.min, self.max))
 
         self.__critical[-1] = True
         if name in self.__values.keys():
@@ -59,7 +63,7 @@ class Manager:
 
     def decrement(self, name):
         while self.__critical[-2]:
-            time.sleep(random.randint(1, self.min))
+            time.sleep(random.randint(self.min, self.max))
 
         self.__critical[-2] = True
         if name in self.__values.keys():
@@ -67,17 +71,20 @@ class Manager:
         self.__critical[-2] = False
 
     def criticalSection(self):
-        p_id = random.randint(0, (self.PARALLEL//8) - 1)
+        p_id = random.randint(0, (self.PARALLEL//CONSTANT) - 1)
         t_id = time.time() * 1000
 
         self.__queue[p_id].append(t_id)
         while self.__critical[p_id] and self.__queue[p_id][0] != t_id:
-            time.sleep(random.randint(1, self.min))
+            time.sleep(random.randint(self.min, self.max))
 
         self.__critical[p_id] = True
 
-        __result = (self.__values["watching"] * 7) < self.__values["threads"]
-        __result = __result or ((self.__values["active"] * 3) < self.__values["idle"])
+        _to_run = (self.__values["threads"] // 100) * self.PARALLEL
+        _workers = self.__values["active"] + self.__values["request"]
+
+        __result = self.__values["watching"] < self.__values["threads"]
+        __result = __result and (_workers < _to_run)
 
         self.__queue[p_id].pop(0)
         self.__critical[p_id] = False
@@ -94,6 +101,7 @@ class Manager:
                 f" REMAKE BY Developers@Work " + Style.RESET_ALL + "\n")
         print(Fore.WHITE + f"BOTS: "+str(self.__values["threads"])+"\n")
         print(Fore.GREEN + f"ACTIVE: "+str(self.__values["active"])+"\n")
+        print(Fore.LIGHTBLACK_EX + f"REQUESTING: "+str(self.__values["request"])+"\n")
         print(Fore.YELLOW + f"IDLE: "+str(self.__values["idle"])+"\n")
         print(Fore.CYAN + f"SUCCESS: "+str(self.__values["success"])+"\n")
         print(Fore.RED + f"PROXIES: "+str(self.__values["proxies"])+"\n")

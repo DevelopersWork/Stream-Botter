@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ## Running
 
 ```
-python main.py threads=<bots> token=<video_id> 
+python main.py threads=<bots> token=<video id> speed=<number between 1 to 10>
 ```
 
 ## Documentation

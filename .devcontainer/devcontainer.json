@@ -4,13 +4,14 @@
 {
 	"name": "YouTube/Twitch View Bot",
 	"image": "python:3.10.1-buster",
-	"containerEnv": { 
+	"containerEnv": {
 		"THREADS": "10", // optmimal value is 500 ~ 1000
 		"TOKEN": "", // video id
-		"PROXY_TYPES": "", // comma seperated proxy types eg. "http,socks4,socks5"
-		"TEMP_DIR": "/tmp" // temporary directory location
+		"PROXY_TYPES": "http", // comma seperated proxy types eg. "http,socks4,socks5"
+		"TEMP_DIR": "/tmp", // temporary directory location
+		"SPEED": "1" // 1 = normal, 2 = double speed, 3 = triple speed
 	},
-	"workspaceMount": "source=${localWorkspaceFolder}/,target=/workspace,type=bind,consistency=cached", 
+	"workspaceMount": "source=${localWorkspaceFolder}/,target=/workspace,type=bind,consistency=cached",
 	"workspaceFolder": "/workspace",
 	"extensions": [
 		"ms-python.python",
@@ -19,5 +20,8 @@
 	"shutdownAction": "none",
 	"onCreateCommand": "/bin/sh build.sh",
 	"postCreateCommand": "pip install -r requirements.txt",
-	"hostRequirements": {"cpus": 1, "memory": "64mb"}
+	"hostRequirements": {
+		"cpus": 1,
+		"memory": "64mb"
+	}
 }

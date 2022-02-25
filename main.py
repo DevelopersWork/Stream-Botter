@@ -7,7 +7,7 @@ from IPython.display import clear_output
 
 # python main.py threads <video_id>
 
-args = {'THREADS': None, 'TOKEN': None, 'PROXY_TYPES': None, 'TEMP_DIR': None}
+args = {'THREADS': None, 'TOKEN': None, 'PROXY_TYPES': None, 'TEMP_DIR': None, 'SPEED': 1}
 # parsing cmd args
 for i in range(len(sys.argv[1::])):
     arg = sys.argv[i + 1].split('=')
@@ -28,6 +28,9 @@ threads = args['THREADS'] if args['THREADS'] else threads
 token = os.environ.get('TOKEN') if os.environ.get('TOKEN') else ""
 token = args['TOKEN'] if args['TOKEN'] else token
 
+speed = os.environ.get('SPEED') if os.environ.get('SPEED') else ""
+speed = args['SPEED'] if args['SPEED'] else speed
+
 from ViewBot.Manager import Manager
 from ViewBot.Proxy import Proxy
 from ViewBot.Bot import Bot
@@ -47,18 +50,20 @@ intro = """
 **NEW** https://github.com/DevelopersWork/YouTube-Livestream-Botter
 """
 
+try:
+    threads = int(threads)
+    speed = int(speed)
+except:
+    threads = 0
+    speed = 1
+
 proxy = Proxy(types)
-manager = Manager(proxy)
+manager = Manager(proxy, speed)
 manager.intro = intro
 browser = None
 # browser = Browser() # Required when only selinum is needed
 bot = Bot(proxy, manager, browser)
 proxy_filter = ProxyFilter(proxy)
-
-try:
-    threads = int(threads)
-except:
-    threads = 0
 
 clear_output(wait=True)
 
@@ -69,8 +74,8 @@ if __name__ == '__main__':
     bot.start()
     manager.print()
 
-    while manager.get('active') or manager.get('idle'):
+    while manager.get('active') or manager.get('request'):
         manager.print(False)
-        time.sleep(random.randint(3,15))
+        time.sleep(random.randint((3 - speed) if speed < 3 else 0, (15 - speed) + 1))
         clear_output(wait=True)
         pass

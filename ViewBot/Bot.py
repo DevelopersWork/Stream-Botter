@@ -16,7 +16,7 @@ import traceback
 from urllib.parse import urlparse, parse_qs
 import string
 
-TIMEOUT = (3, 60)
+TIMEOUT = (10, 15)
 RETRIES = 5
 YT_HEAD_URL = """https://s.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=isWmmj2C9Y2vULKF&docid={0}&ver=2&cmt=7334&ei={1}&fmt=133&fs=0&rt=1003&of={2}&euri&lact=4418&live=dvr&cl={3}&state=playing&vm={4}&volume={5}&c=MWEB&cver=2.20200313.03.00&cplayer=UNIPLAYER&cbrand=apple&cbr=Safari%20Mobile&cbrver=12.1.15E148&cmodel=iphone&cos=iPhone&cosver=12_2&cplatform=MOBILE&delay=5&hl=ru&cr=GB&rtn=1303&afmt=140&lio=1556394045.182&idpj=&ldpj=&rti=1003&muted=0&st=7334&et=7634"""
 
@@ -185,11 +185,12 @@ class Bot:
         http.mount('https://', self.__adapter)
         http.mount('http://', self.__adapter)
 
-        idle = 0
+        request = 0
         active = 0
+        failed = False
         try:
-            self.__values["manager"].increment("idle")
-            idle = 1
+            self.__values["manager"].increment("request")
+            request = 1
 
             if formatted_proxy != None:
                 request = self.__getRequest(
@@ -204,17 +205,17 @@ class Bot:
                 )
             args = request['args']
 
-            self.__values["manager"].increment("active")
-            active = 1
-
-            self.__values["manager"].decrement("idle")
-            idle = 0
+            self.__values["manager"].decrement("request")
+            request = 0
             
             origin = datetime.datetime(1970,1,1,0,0,0,0)
             now = datetime.datetime.utcnow()
             start = now - origin
 
             self.__sleepThread(mn=18, mx=60)
+
+            self.__values["manager"].increment("active")
+            active = 1
 
             now = datetime.datetime.utcnow() - origin
 
@@ -252,8 +253,6 @@ class Bot:
             self.__values["manager"].decrement("active")
             active = 0
 
-            self.__sleepThread()
-
             return True
 
         except (
@@ -269,7 +268,7 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 5)
             else:
                 self.__saveLog(msg)
-            self.__sleepThread(failed = True)
+            failed = True
 
         except (
             requests.exceptions.ChunkedEncodingError,
@@ -284,7 +283,7 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 2)
             else:
                 self.__saveLog(msg)
-            self.__sleepThread(failed = True)
+            failed = True
 
         except Exception as e:
             msg = e
@@ -295,15 +294,17 @@ class Bot:
                 self.__values["proxy"].setProxyFailure(formatted_proxy["index"], 1)
             else:
                 self.__saveLog(msg)
-            self.__sleepThread(failed = True)
+            failed = True
 
         finally:
 
             if active == 1:
                 self.__values["manager"].decrement("active")
 
-            if idle == 1:
-                self.__values["manager"].decrement("idle")
+            if request == 1:
+                self.__values["manager"].decrement("request")
+
+            self.__sleepThread(failed)
 
         return False
     
@@ -312,12 +313,14 @@ class Bot:
             mx = (self.__values["threads"] // 10) * 3
 
         if failed:
-            mx *= 1.3
+            mx *= 1.2
 
         if not mn:
             mn = (self.__values["manager"].get("active") // 10) % 6
 
+        self.__values["manager"].increment("idle")
         time.sleep(random.randint(mn, mx))
+        self.__values["manager"].decrement("idle")
 
 
     def __saveLog(self, message, head="BOT"):
