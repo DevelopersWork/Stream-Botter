@@ -109,10 +109,7 @@ class Bot:
                 except Exception as e:
                     viewCount = 1
                 try:
-                    if len(html.split('"isLive": true')):
-                        watching = int(html.split('" }, { "text": " watching now" }')[0].split('"')[-1])
-                    else:
-                        watching = 1
+                    watching = int("".join(html.split(' watching now')[0].split('\\x22')).split('text:')[-2].split('\\')[0])
                 except Exception as e:
                     watching = 1
 
