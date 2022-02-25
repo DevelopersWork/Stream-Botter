@@ -16,9 +16,9 @@ import traceback
 from urllib.parse import urlparse, parse_qs
 import string
 
-TIMEOUT = (10, 15)
-RETRIES = 5
-YT_HEAD_URL = """https://s.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=isWmmj2C9Y2vULKF&docid={0}&ver=2&cmt=7334&ei={1}&fmt=133&fs=0&rt=1003&of={2}&euri&lact=4418&live=dvr&cl={3}&state=playing&vm={4}&volume={5}&c=MWEB&cver=2.20200313.03.00&cplayer=UNIPLAYER&cbrand=apple&cbr=Safari%20Mobile&cbrver=12.1.15E148&cmodel=iphone&cos=iPhone&cosver=12_2&cplatform=MOBILE&delay=5&hl=ru&cr=GB&rtn=1303&afmt=140&lio=1556394045.182&idpj=&ldpj=&rti=1003&muted=0&st=7334&et=7634"""
+TIMEOUT = (3, 12)
+RETRIES = 3
+YT_HEAD_URL = """http://s.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=isWmmj2C9Y2vULKF&docid={0}&ver=2&cmt=7334&ei={1}&fmt=133&fs=0&rt=1003&of={2}&euri&lact=4418&live=dvr&cl={3}&state=playing&vm={4}&volume={5}&c=MWEB&cver=2.20200313.03.00&cplayer=UNIPLAYER&cbrand=apple&cbr=Safari%20Mobile&cbrver=12.1.15E148&cmodel=iphone&cos=iPhone&cosver=12_2&cplatform=MOBILE&delay=5&hl=ru&cr=GB&rtn=1303&afmt=140&lio=1556394045.182&idpj=&ldpj=&rti=1003&muted=0&st=7334&et=7634"""
 
 
 def randomword(length=16):
@@ -34,7 +34,7 @@ class Bot:
             "threads": 1
         }
 
-        __backoff_factor = 3
+        __backoff_factor = 2
         __retry_strategy = Retry(
             total=RETRIES,
             read=RETRIES,
@@ -44,7 +44,7 @@ class Bot:
         )
         self.__adapter = HTTPAdapter(max_retries=__retry_strategy)
 
-        self.__ua = UserAgent("ios")
+        self.__ua = UserAgent("ios", requestsPrefix=True)
 
         self.__platform = "youtube"
         self.__token = ""
@@ -63,7 +63,7 @@ class Bot:
         return headers
 
     def __getUrl(self,args):
-        url = "https://s.youtube.com/api/stats/watchtime?"
+        url = "http://s.youtube.com/api/stats/watchtime?"
         
         for k,v in args.items():
             url += "{0}={1}&".format(k,v)
@@ -76,17 +76,16 @@ class Bot:
         header = self.__getHeader(ua)
         __url = ""
         if self.__platform == "youtube":
-            __url = 'https://m.youtube.com/watch?v=' + self.__token
+            __url = 'http://www.youtube.com/watch?v=' + self.__token
             header['Referer'] = __url
 
             try:
-                header["Host"] = 'm.youtube.com'
+                header["Host"] = 'www.youtube.com'
                 if proxy != None:
                     response = session.get(
                         __url,
                         headers=header,
-                        proxies=proxy,
-                        timeout=TIMEOUT
+                        proxies=proxy
                     )
                 else:
                     response = session.get(
@@ -109,20 +108,19 @@ class Bot:
                 except Exception as e:
                     viewCount = 1
                 try:
-                    if len(data.split('"isLive": true')):
-                        watching = int(data.split('" }, { "text": " watching now" }')[0].split('"')[-1])
+                    if len(html.split('"isLive": true')):
+                        watching = int(html.split('" }, { "text": " watching now" }')[0].split('"')[-1])
                     else:
                         watching = 1
                 except Exception as e:
                     watching = 1
+
                 try:    
-                    videoTitle = html.split("<meta itemprop=\"name\"")[1].split('>')[0].split('"')[1]
+                    videoTitle = html.split('"title":{"runs":[{"text":"')[1].split('"')[0]
                 except Exception as e:
                     videoTitle = ""
-                try:
-                    videoLink = html.split("<link itemprop=\"url\" href=\"")[1].split('"')[0]
-                except Exception as e:
-                    videoLink = __url
+
+                videoLink = __url
 
                 parsed_url = urlparse(url)
                 params = parse_qs(parsed_url.query)
@@ -190,15 +188,15 @@ class Bot:
 
     def __request(self):
 
-        agent = self.__ua.Random()
+        agent = self.__ua.Random()['User-Agent']
 
         formatted_proxy = None
         if self.__values["proxy"] != None:
             formatted_proxy = self.__values["proxy"].getRandomProxy()
 
         http = requests.Session()
-        http.mount('https://', self.__adapter)
-        http.mount('http://', self.__adapter)
+        # http.mount('https://', self.__adapter)
+        # http.mount('http://', self.__adapter)
 
         request_flag = 0
         active = 0
@@ -229,7 +227,9 @@ class Bot:
             now = datetime.datetime.utcnow()
             start = now - origin
 
-            self.__sleepThread(mn=18, mx=60)
+            self.__sleepThread(mn=1, mx=6)
+            while not self.__values["manager"].criticalSection():
+                self.__sleepThread(failed = True)
 
             now = datetime.datetime.utcnow() - origin
 
@@ -239,15 +239,6 @@ class Bot:
             args['et'] = str(et)
             args['lio'] = str(lio)
             args['cmt'] = str(et)
-
-            http.get(
-                self.__getUrl(args).replace("watchtime", "playback"),
-                headers=request['headers'],
-                proxies=request['proxies'],
-                timeout=TIMEOUT
-            )
-
-            self.__sleepThread(mn=18, mx=60)
 
             http.get(
                 self.__getUrl(args).replace("watchtime", "playback"),
@@ -383,8 +374,6 @@ class Bot:
         )
 
         while self.run:
-            while not self.__values["manager"].criticalSection():
-                self.__sleepThread(failed = True)
             self.__request()
         self.__values["manager"].decrement("threads")
 
