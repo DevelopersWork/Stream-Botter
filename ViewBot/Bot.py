@@ -96,7 +96,7 @@ class Bot:
                     )
                 
                 if response.status_code != 200:
-                    raise Exception('SERVER DOWN OR WHAT')
+                    raise Exception('REQUEST STATUS IS NOT 200')
 
                 html = response.text
 
@@ -107,9 +107,13 @@ class Bot:
                 try:
                     viewCount = int(html.split('"viewCount":')[1].split(',')[0].strip('"'))
                     watching = int("".join(html.split(' watching now')[0].split('\\x22')).split('text:')[-2].split('\\')[0])
+                    videoTitle = html.split("<meta itemprop=\"name\"")[1].split('>')[0].split('"')[1]
+                    videoLink = html.split("<link itemprop=\"url\" href=\"")[1].split('"')[0]
                 except Exception as e:
                     viewCount = 1
                     watching = 1
+                    videoTitle = ""
+                    videoLink = __url
 
                 parsed_url = urlparse(url)
                 params = parse_qs(parsed_url.query)
@@ -164,7 +168,9 @@ class Bot:
                     'proxies': proxy,
                     'link': __url,
                     'viewCount': viewCount,
-                    'watching': watching
+                    'watching': watching,
+                    'link': videoLink,
+                    'title': videoTitle
                 }
             except Exception as e:
                 raise Exception(e)
@@ -185,12 +191,12 @@ class Bot:
         http.mount('https://', self.__adapter)
         http.mount('http://', self.__adapter)
 
-        request = 0
+        request_flag = 0
         active = 0
         failed = False
         try:
             self.__values["manager"].increment("request")
-            request = 1
+            request_flag = 1
 
             if formatted_proxy != None:
                 request = self.__getRequest(
@@ -206,7 +212,7 @@ class Bot:
             args = request['args']
 
             self.__values["manager"].decrement("request")
-            request = 0
+            request_flag = 0
             self.__values["manager"].increment("active")
             active = 1
             
@@ -250,6 +256,8 @@ class Bot:
 
             self.__values["manager"].set('views', request['viewCount'])
             self.__values["manager"].set('watching', request['watching'])
+            self.__values["manager"].set('link', request['link'])
+            self.__values["manager"].set('title', request['title'])
 
             if self.__values["proxy"] != None:
                 self.__values["proxy"].setProxyFailure(
@@ -305,11 +313,10 @@ class Bot:
             failed = True
 
         finally:
-
             if active == 1:
                 self.__values["manager"].decrement("active")
 
-            if request == 1:
+            if request_flag == 1:
                 self.__values["manager"].decrement("request")
 
             self.__sleepThread(failed)

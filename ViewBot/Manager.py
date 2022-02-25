@@ -32,6 +32,8 @@ class Manager:
             'idle': 0,
             "watching": 1,
             'views': 1,
+            'link': "",
+            'title': ""
         }
         self.__critical = [False for _ in range(self.PARALLEL//CONSTANT)]
         self.__critical.append(False)
@@ -99,6 +101,12 @@ class Manager:
             print(Fore.MAGENTA + self.intro + Style.RESET_ALL + "\n")
             print(Back.WHITE + Style.BRIGHT + Fore.LIGHTBLUE_EX +
                 f" REMAKE BY Developers@Work " + Style.RESET_ALL + "\n")
+
+        print(Fore.LIGHTRED_EX + f"VIDEO LINK: " + Back.LIGHTBLACK_EX + Style.BRIGHT +
+                self.__values["link"] + Style.RESET_ALL + "\n")
+        print(Fore.LIGHTRED_EX + f"VIDEO TITLE: " + Back.LIGHTBLACK_EX + Style.BRIGHT +
+                self.__values["title"] + Style.RESET_ALL + "\n")
+            
         print(Fore.WHITE + f"BOTS: "+str(self.__values["threads"])+"\n")
         print(Fore.GREEN + f"ACTIVE: "+str(self.__values["active"])+"\n")
         print(Fore.LIGHTBLACK_EX + f"CONNECTING: "+str(self.__values["request"])+"\n")
@@ -107,7 +115,7 @@ class Manager:
         print(Fore.RED + f"PROXIES: "+str(self.__values["proxies"])+"\n")
         print(Fore.BLUE + f"WATCHING: "+str(self.__values["watching"])+"\n")
         print(Fore.GREEN + f"VIEWS: "+str(self.__values["views"])+"\n")
-        print(Style.RESET_ALL)
 
+        print(Style.RESET_ALL)
 
 "Manager"
