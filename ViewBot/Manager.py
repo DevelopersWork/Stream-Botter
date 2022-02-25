@@ -83,10 +83,11 @@ class Manager:
         self.__critical[p_id] = True
 
         _to_run = (self.__values["threads"] // 100) * self.PARALLEL
-        _workers = self.__values["request"]
+        _passive_workers = self.__values["request"] 
+        _active_workers = self.__values["active"] 
 
         __result = self.__values["watching"] < self.__values["threads"]
-        __result = __result and (_workers < _to_run)
+        __result = __result and (_passive_workers < _to_run) and (_active_workers > (_passive_workers//4))
 
         self.__queue[p_id].pop(0)
         self.__critical[p_id] = False
