@@ -92,16 +92,16 @@ class Proxy:
         _output = {"http": "", "https": ""}
         if proxyType == "http":
             _output['http'] = "http://"
-            _output['https'] = "https://"
-        if proxyType == "socks4":
+            # _output['https'] = "https://"
+        elif proxyType == "socks4":
             _output['http'] = "socks4://"
-            _output['https'] = "socks4://"
-        if proxyType == "socks5":
+            # _output['https'] = "socks4://"
+        elif proxyType == "socks5":
             _output['http'] = "socks5://"
-            _output['https'] = "socks5://"
+            # _output['https'] = "socks5://"
 
         _output['http'] += proxy
-        _output['https'] += proxy
+        # _output['https'] += proxy
 
         return _output
 
