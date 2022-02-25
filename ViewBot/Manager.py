@@ -81,7 +81,7 @@ class Manager:
         self.__critical[p_id] = True
 
         _to_run = (self.__values["threads"] // 100) * self.PARALLEL
-        _workers = self.__values["active"] + self.__values["request"]
+        _workers = self.__values["request"]
 
         __result = self.__values["watching"] < self.__values["threads"]
         __result = __result and (_workers < _to_run)
@@ -101,7 +101,7 @@ class Manager:
                 f" REMAKE BY Developers@Work " + Style.RESET_ALL + "\n")
         print(Fore.WHITE + f"BOTS: "+str(self.__values["threads"])+"\n")
         print(Fore.GREEN + f"ACTIVE: "+str(self.__values["active"])+"\n")
-        print(Fore.LIGHTBLACK_EX + f"REQUESTING: "+str(self.__values["request"])+"\n")
+        print(Fore.LIGHTBLACK_EX + f"CONNECTING: "+str(self.__values["request"])+"\n")
         print(Fore.YELLOW + f"IDLE: "+str(self.__values["idle"])+"\n")
         print(Fore.CYAN + f"SUCCESS: "+str(self.__values["success"])+"\n")
         print(Fore.RED + f"PROXIES: "+str(self.__values["proxies"])+"\n")

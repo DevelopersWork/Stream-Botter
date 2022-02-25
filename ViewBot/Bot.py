@@ -207,15 +207,14 @@ class Bot:
 
             self.__values["manager"].decrement("request")
             request = 0
+            self.__values["manager"].increment("active")
+            active = 1
             
             origin = datetime.datetime(1970,1,1,0,0,0,0)
             now = datetime.datetime.utcnow()
             start = now - origin
 
             self.__sleepThread(mn=18, mx=60)
-
-            self.__values["manager"].increment("active")
-            active = 1
 
             now = datetime.datetime.utcnow() - origin
 
@@ -225,6 +224,15 @@ class Bot:
             args['et'] = str(et)
             args['lio'] = str(lio)
             args['cmt'] = str(et)
+
+            http.get(
+                self.__getUrl(args).replace("watchtime", "playback"),
+                headers=request['headers'],
+                proxies=request['proxies'],
+                timeout=TIMEOUT
+            )
+
+            self.__sleepThread(mn=18, mx=60)
 
             http.get(
                 self.__getUrl(args).replace("watchtime", "playback"),
