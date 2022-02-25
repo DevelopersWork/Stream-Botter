@@ -3,7 +3,7 @@ from colorama import Fore, init, Style, Back
 import time
 import random
 
-CONSTANT = 6
+CONSTANT = 10
 
 class Manager:
 
@@ -17,7 +17,7 @@ class Manager:
             "proxy": proxy
         }
         self.PARALLEL = CONSTANT * speed
-        self.__queue = [[] for _ in range(self.PARALLEL // CONSTANT)]
+        self.__queue = [[] for _ in range(self.PARALLEL // (CONSTANT // 2))]
         self.__resetValues(valuesTable)
 
         self.speed = speed
@@ -87,7 +87,7 @@ class Manager:
         _active_workers = self.__values["active"] 
 
         __result = self.__values["watching"] < self.__values["threads"]
-        __result = __result and (_passive_workers < _to_run) and ((_active_workers >= (_passive_workers//4) or _passive_workers == 0 or _active_workers == 0))
+        __result = __result and (_active_workers < self.PARALLEL)
 
         self.__queue[p_id].pop(0)
         self.__critical[p_id] = False

@@ -52,6 +52,9 @@ class ProxyFilter:
         # Calculate the request timeout in milliseconds
         timeout = round(c.getinfo(c.CONNECT_TIME) * 1000)
 
+        if timeout > 8000:
+            return False
+
         # Decode the response content
         response = response.getvalue().decode('iso-8859-1')
 
