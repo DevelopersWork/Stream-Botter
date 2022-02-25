@@ -332,7 +332,10 @@ class Bot:
             mn = (self.__values["manager"].get("active") // 10) % 6
 
         self.__values["manager"].increment("idle")
-        time.sleep(random.randint(mn, mx))
+        try:
+            time.sleep(random.randint(mn, mx))
+        except Exception as e:
+            time.sleep(1)
         self.__values["manager"].decrement("idle")
 
 
