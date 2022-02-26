@@ -11,7 +11,7 @@ import os
 import datetime
 import time
 from threading import Thread
-import traceback
+import logging
 
 from urllib.parse import urlparse, parse_qs
 import string
@@ -225,7 +225,7 @@ class Bot:
             now = datetime.datetime.utcnow()
             start = now - origin
 
-            self.__sleepThread(mn=15, mx=30)
+            self.__sleepThread(mn=20, mx=60)
             while not self.__values["manager"].criticalSection():
                 self.__sleepThread(failed = True)
 
@@ -238,19 +238,25 @@ class Bot:
             args['lio'] = str(lio)
             args['cmt'] = str(et)
 
-            http.get(
+            response = http.get(
                 self.__getUrl(args).replace("watchtime", "playback"),
                 headers=request['headers'],
                 proxies=request['proxies'],
                 timeout=TIMEOUT
             )
 
-            http.get(
+            if response.status_code != 204:
+                raise Exception('BOT PLAYBACK STATUS IS NOT 204')
+
+            response = http.get(
                 self.__getUrl(args),
                 headers=request['headers'],
                 proxies=request['proxies'],
                 timeout=TIMEOUT
             )
+
+            if response.status_code != 204:
+                raise Exception('BOT WATCHTIME STATUS IS NOT 204')
 
             if self.__values["browser"]:
                 self.__values["browser"].open(
@@ -324,7 +330,7 @@ class Bot:
             if request_flag == 1:
                 self.__values["manager"].decrement("request")
 
-            self.__sleepThread(failed)
+            self.__sleepThread(failed=failed)
 
         return False
     
@@ -345,14 +351,16 @@ class Bot:
             time.sleep(1)
         self.__values["manager"].decrement("idle")
 
-
     def __saveLog(self, message, head="BOT"):
 
         timestamp = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
         log = "[" + head + "] " + timestamp + ":\t" + str(message) + "\n"
 
-        __dir = self.__values['proxy'].getDir() + 'logs/'
+        if "proxy" in self.__values.keys() and self.__values['proxy']:
+            __dir = self.__values['proxy'].getDir() + 'logs/'
+        else:
+            __dir = '/tmp/viewbot/' + 'logs/'
         os.makedirs(__dir, exist_ok = True)
         __file = 'logs.txt'
 

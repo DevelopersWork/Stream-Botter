@@ -9,7 +9,10 @@ class ProxyFilter:
 
     def __init__(self, proxy, output_dir = None, output_file="failed.txt"):
 
-        self.__dir = proxy.getDir()
+        if proxy:
+            self.__dir = proxy.getDir()
+        else:
+            self.__dir = "/tmp/viewbot/"
 
         self.__location = self.__dir + 'proxies/dead.txt'
 
