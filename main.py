@@ -34,9 +34,6 @@ speed = args['SPEED'] if args['SPEED'] else speed
 from ViewBot.Manager import Manager
 from ViewBot.Proxy import Proxy
 from ViewBot.Bot import Bot
-from ViewBot.ProxyFilter import ProxyFilter
-# from ViewBot.Browser import Browser
-
 
 intro = """
 ███████╗████████╗██████╗ ███████╗ █████╗ ███╗   ███╗      ██████╗  ██████╗ ████████╗████████╗███████╗██████╗
@@ -61,9 +58,7 @@ proxy = Proxy(types)
 manager = Manager(proxy, speed)
 manager.intro = intro
 browser = None
-# browser = Browser() # Required when only selinum is needed
 bot = Bot(proxy, manager, browser)
-# proxy_filter = ProxyFilter(proxy)
 
 clear_output(wait=True)
 
