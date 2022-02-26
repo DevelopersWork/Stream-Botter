@@ -43,8 +43,6 @@ class Bot:
         )
         self.__adapter = HTTPAdapter(max_retries=__retry_strategy)
 
-        self.__ua = UserAgent("chrome", requestsPrefix=True)
-
         self.__platform = "youtube"
         self.__token = ""
         self.run = False
@@ -138,7 +136,7 @@ class Bot:
                     watching = 1
 
                 try:    
-                    videoTitle = html.split('"title":')[1].split('"runs":')[1].split('"text":').split('"')[1]
+                    videoTitle = html.split('"videoDetails":')[1].split('"title":')[1].split('"')[1]
                 except Exception as e:
                     videoTitle = ""
 
