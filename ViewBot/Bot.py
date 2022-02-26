@@ -289,10 +289,10 @@ class Bot:
         finally:
             if active == 1:
                 self.__values["manager"].decrement("active")
+                self.__values["manager"].increment("failed")
 
             if request_flag == 1:
                 self.__values["manager"].decrement("request")
-                self.__values["manager"].increment("failed")
 
             self.__sleepThread(failed=failed)
 
