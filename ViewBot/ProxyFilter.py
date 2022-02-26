@@ -77,7 +77,7 @@ class ProxyFilter:
 
     def start(self, reset = False):
         if reset and self.__proxy:
-            self.__proxy.reset()
+            self.__proxy.reset(reset)
 
         if not os.path.exists(self.__location):
             return False
@@ -95,7 +95,7 @@ class ProxyFilter:
             t.join()
 
         os.makedirs(self.__output_location, exist_ok=True)
-        
+
         with open(self.__output_location + self.__output_file, 'w') as file:
             file.write("\n".join(self.__dead))
             file.close()
