@@ -44,7 +44,7 @@ class Bot:
         )
         self.__adapter = HTTPAdapter(max_retries=__retry_strategy)
 
-        self.__ua = UserAgent("ios", requestsPrefix=True)
+        self.__ua = UserAgent("windows", requestsPrefix=True)
 
         self.__platform = "youtube"
         self.__token = ""
@@ -76,11 +76,11 @@ class Bot:
         header = self.__getHeader(ua)
         __url = ""
         if self.__platform == "youtube":
-            __url = 'http://m.youtube.com/watch?v=' + self.__token
+            __url = 'http://www.youtube.com/watch?v=' + self.__token
             header['Referer'] = __url
 
             try:
-                header["Host"] = 'm.youtube.com'
+                header["Host"] = 'www.youtube.com'
                 if proxy != None:
                     response = session.get(
                         __url,
@@ -100,7 +100,7 @@ class Bot:
 
                 html = response.text
 
-                url = html.split('baseUrl')[3].split('"')[2]
+                url = html.split('"videostatsWatchtimeUrl":{"baseUrl":"')[1].split('"')[0]
                 url = url.replace('%2C', ',').replace("\/", '/')
                 url = '&'.join(url.split('\\u0026'))
 
@@ -146,14 +146,14 @@ class Bot:
                     "state" : "playing",
                     "vm" : params["vm"][0],
                     "volume" : str(random.randint(10, 80)),
-                    "cbr" : "Safari%20Mobile", #"Firefox",
-                    "cbrver" : "12.1.15E148", #"83.0",
-                    "c" : "MWEB",#"WEB",
+                    "cbr" : "Firefox",
+                    "cbrver" : "83.0",
+                    "c" : "WEB",
                     "cplayer" : "UNIPLAYER",
-                    "cver" : "2.20200313.03.00", #"2.20201210.01.00",
-                    "cos" : "iPhone",#"Windows",
-                    "cosver" : "12_2",#"10.0",
-                    "cplatform" : "MOBILE",#"DESKTOP",
+                    "cver" : "2.20201210.01.00",
+                    "cos" : "Windows",
+                    "cosver" : "10.0",
+                    "cplatform" : "DESKTOP",
                     "delay" : "5",
                     "hl" : "en_US",
                     "rtn" : str(rtn),
@@ -225,7 +225,7 @@ class Bot:
             now = datetime.datetime.utcnow()
             start = now - origin
 
-            self.__sleepThread(mn=1, mx=6)
+            self.__sleepThread(mn=15, mx=30)
             while not self.__values["manager"].criticalSection():
                 self.__sleepThread(failed = True)
 
@@ -240,6 +240,13 @@ class Bot:
 
             http.get(
                 self.__getUrl(args).replace("watchtime", "playback"),
+                headers=request['headers'],
+                proxies=request['proxies'],
+                timeout=TIMEOUT
+            )
+
+            http.get(
+                self.__getUrl(args),
                 headers=request['headers'],
                 proxies=request['proxies'],
                 timeout=TIMEOUT
