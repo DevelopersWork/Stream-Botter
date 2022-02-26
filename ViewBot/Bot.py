@@ -18,8 +18,7 @@ import string
 
 TIMEOUT = (10, 60)
 RETRIES = 5
-YT_HEAD_URL = """http://s.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=isWmmj2C9Y2vULKF&docid={0}&ver=2&cmt=7334&ei={1}&fmt=133&fs=0&rt=1003&of={2}&euri&lact=4418&live=dvr&cl={3}&state=playing&vm={4}&volume={5}&c=MWEB&cver=2.20200313.03.00&cplayer=UNIPLAYER&cbrand=apple&cbr=Safari%20Mobile&cbrver=12.1.15E148&cmodel=iphone&cos=iPhone&cosver=12_2&cplatform=MOBILE&delay=5&hl=ru&cr=GB&rtn=1303&afmt=140&lio=1556394045.182&idpj=&ldpj=&rti=1003&muted=0&st=7334&et=7634"""
-
+YT_HEAD_URL = """http://www.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=ffJ4ox8wjzBTkFgg&ver=2&cmt=3861.927&fmt=134&fs=0&rt=1205.848&euri&lact=105209&live=dvr&cl=430552675&state=playing&volume=100%2C100%2C100%2C100&subscribed=1&cbr=Chrome&cbrver=98.0.4758.102&c=WEB&cver=2.20220224.07.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&delay=5&hl=en_US&cr=IN&rtn=1245&afmt=140&lio=1645876585.308&idpj=-3&ldpj=-28&rti=1205&st=3822.045%2C3860.134%2C3860.571%2C3861.837&et=3860.134%2C3860.571%2C3861.837%2C3861.927&muted=1%2C1%2C1%2C1&vis=3%2C0%2C3%2C0&docid=VbL4AA7f9D8&ei=0x8aYvHbHYKxgAPIgauwDg&plid=AAXY6yAh3j-t8xTl&referrer=https%3A%2F%2Fwww.youtube.com%2Fc%2FSAMURAITeluguGamer&sdetail=p%3A%2Fc%2FSAMURAITeluguGamer&sourceid=y&of=re3rc5R2DIc7Axbc_lERng&vm=CAEQARgEOjJBS1JhaHdDOHRfcG52TUhRSnFMUng1MEQxQ2R0UUZRMTF4MC1KZzhvZWRQbFJyTGZZQWJMQVBta0tES1NxYU1PMEllVW5lVmdISElzaXVsUDFaRlBLeU1NRjVyakg3WjNFZTFRRjdUSUpna2lYZ0Z5d3BfSzluNG4xTzlkWTBUSg"""
 
 def randomword(length=16):
    letters = string.ascii_lowercase
@@ -44,7 +43,7 @@ class Bot:
         )
         self.__adapter = HTTPAdapter(max_retries=__retry_strategy)
 
-        self.__ua = UserAgent("windows", requestsPrefix=True)
+        self.__ua = UserAgent("chrome", requestsPrefix=True)
 
         self.__platform = "youtube"
         self.__token = ""
@@ -62,11 +61,19 @@ class Bot:
 
         return headers
 
-    def __getUrl(self,args):
-        url = "http://s.youtube.com/api/stats/watchtime?"
+    def __getUrl(self, args):
+        url = YT_HEAD_URL.split('?')[0] + '?'
+
+        parsed_url = urlparse(YT_HEAD_URL)
+        params = parse_qs(parsed_url.query)
         
-        for k,v in args.items():
-            url += "{0}={1}&".format(k,v)
+        for k,v in params.items():
+            if k in args.keys():
+                url += "{0}={1}&".format(k, args[k])
+            else:
+                url += "{0}={1}&".format(k,v[0])
+
+        self.__saveLog(url)
 
         return url
 
@@ -123,52 +130,8 @@ class Bot:
                 parsed_url = urlparse(url)
                 params = parse_qs(parsed_url.query)
 
-                rt = random.randint(10, 200)
-                rtn = rt + 300
-                header["Host"] = 'www.youtube.com'
-
-                args = {
-                    "ns" : params["ns"][0],
-                    "el" : params["el"][0],
-                    "cpn" : randomword(),
-                    "docid" : params["docid"][0],
-                    "ver" : "2",
-                    "cmt" : "LOAD BELOW",
-                    "ei" : params["ei"][0],
-                    "fmt" : "243",
-                    "fs" : "0",
-                    "rt" : str(rt),
-                    "of" : params["of"][0],
-                    "euri" : "",
-                    "lact" : str(random.randint(1000, 8000)),
-                    "live" : params["live"][0],
-                    "cl" : params["cl"][0],
-                    "state" : "playing",
-                    "vm" : params["vm"][0],
-                    "volume" : str(random.randint(10, 80)),
-                    "cbr" : "Firefox",
-                    "cbrver" : "83.0",
-                    "c" : "WEB",
-                    "cplayer" : "UNIPLAYER",
-                    "cver" : "2.20201210.01.00",
-                    "cos" : "Windows",
-                    "cosver" : "10.0",
-                    "cplatform" : "DESKTOP",
-                    "delay" : "5",
-                    "hl" : "en_US",
-                    "rtn" : str(rtn),
-                    "aftm" : "140",
-                    "rti" : str(rt),
-                    "muted" : "0",
-                    "st" : str(random.randint(1000, 10000)),
-                    "et" : "LOAD BELOW",
-                    "lio" : "LOAD BELOW"
-                }
-
                 request = {
-                    # 'url': YT_HEAD_URL.format(self.__token, ei, of, cl, vm, str(int(random.random() * 100 % 80))),
-                    'args': args,
-                    # 'url': self.__getUrl(args),
+                    'args': params,
                     'headers': header,
                     'proxies': proxy,
                     'link': __url,
@@ -225,7 +188,7 @@ class Bot:
             now = datetime.datetime.utcnow()
             start = now - origin
 
-            self.__sleepThread(mn=20, mx=60)
+            self.__sleepThread(mn=15, mx=30)
             while not self.__values["manager"].criticalSection():
                 self.__sleepThread(failed = True)
 
@@ -238,15 +201,15 @@ class Bot:
             args['lio'] = str(lio)
             args['cmt'] = str(et)
 
-            response = http.get(
-                self.__getUrl(args).replace("watchtime", "playback"),
-                headers=request['headers'],
-                proxies=request['proxies'],
-                timeout=TIMEOUT
-            )
+            # response = http.get(
+            #     self.__getUrl(args).replace("watchtime", "playback"),
+            #     headers=request['headers'],
+            #     proxies=request['proxies'],
+            #     timeout=TIMEOUT
+            # )
 
-            if response.status_code != 204:
-                raise Exception('BOT PLAYBACK STATUS IS NOT 204')
+            # if response.status_code != 204:
+            #     raise Exception('BOT PLAYBACK STATUS IS NOT 204')
 
             response = http.get(
                 self.__getUrl(args),
@@ -329,6 +292,7 @@ class Bot:
 
             if request_flag == 1:
                 self.__values["manager"].decrement("request")
+                self.__values["manager"].increment("failed")
 
             self.__sleepThread(failed=failed)
 

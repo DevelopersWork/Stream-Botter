@@ -26,6 +26,7 @@ class Manager:
         self.__values = {
             "threads": 0,
             "request": 0,
+            "failed": 0,
             "active": 0,
             "success": 0,
             "proxies": 0,
@@ -114,7 +115,8 @@ class Manager:
         print(Fore.LIGHTBLACK_EX + f"CONNECTING: "+str(self.__values["request"])+"\n")
         print(Fore.YELLOW + f"IDLE: "+str(self.__values["idle"])+"\n")
         print(Fore.CYAN + f"SUCCESS: "+str(self.__values["success"])+"\n")
-        print(Fore.RED + f"PROXIES: "+str(self.__values["proxies"])+"\n")
+        print(Fore.RED + f"FAILED: "+str(self.__values["failed"])+"\n")
+        print(Fore.WHITE + f"PROXIES: "+str(self.__values["proxies"])+"\n")
         print(Fore.BLUE + f"WATCHING: "+str(self.__values["watching"])+"\n")
         print(Fore.GREEN + f"VIEWS: "+str(self.__values["views"])+"\n")
 
