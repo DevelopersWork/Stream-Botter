@@ -77,6 +77,31 @@ class Proxy:
     def getDir(self):
         return self.__tmp_dir
 
+    def reset(self, verify = False):
+        path = self.__tmp_dir + 'proxies/'
+
+        files = os.listdir(path)
+
+        _data = ""
+        if verify:
+            with open(path + 'dead.txt', 'r') as file:
+                _data += file.read()
+                file.close()
+        
+        for f in files:
+            if f.split('.')[0] in self.__source:
+                if verify and f != 'dead.txt':
+                    with open(path + f) as file:
+                        _data += "\n" + file.read()  
+                else:
+                    os.remove(path + f)
+        
+        if verify:
+            with open(path + 'dead.txt', 'w') as file:
+                file.write(_data)
+                file.close()
+
+
     def __fetchProxies(self):
         self.__proxies = {}
         for proxyType in self.__types:

@@ -63,7 +63,7 @@ manager.intro = intro
 browser = None
 # browser = Browser() # Required when only selinum is needed
 bot = Bot(proxy, manager, browser)
-proxy_filter = ProxyFilter(proxy)
+# proxy_filter = ProxyFilter(proxy)
 
 clear_output(wait=True)
 
