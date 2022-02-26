@@ -13,9 +13,9 @@ class Manager:
         self.min = (3 - speed) if speed < 3 else 0
         self.max = (15 - speed) + 1
         self.run = False
-        self.__objects = {
-            "proxy": proxy
-        }
+        self.__objects = dict()
+        if proxy:
+            self.__objects["proxy"] = proxy
         self.PARALLEL = CONSTANT * speed
         self.__queue = [[] for _ in range(self.PARALLEL // (CONSTANT // 2))]
         self.__resetValues(valuesTable)
@@ -96,7 +96,8 @@ class Manager:
 
     def print(self, printIntro = True):
 
-        self.__values["proxies"] = self.__objects["proxy"].getProxiesCount()
+        if "proxy" in self.__objects.keys():
+            self.__values["proxies"] = self.__objects["proxy"].getProxiesCount()
 
         if printIntro:
             print(Fore.MAGENTA + self.intro + Style.RESET_ALL + "\n")
