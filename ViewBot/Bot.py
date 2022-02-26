@@ -44,7 +44,7 @@ class Bot:
         )
         self.__adapter = HTTPAdapter(max_retries=__retry_strategy)
 
-        self.__ua = UserAgent("mobile+ios", requestsPrefix=True)
+        self.__ua = UserAgent("windows", requestsPrefix=True)
 
         self.__platform = "youtube"
         self.__token = ""
@@ -76,11 +76,11 @@ class Bot:
         header = self.__getHeader(ua)
         __url = ""
         if self.__platform == "youtube":
-            __url = 'http://m.youtube.com/watch?v=' + self.__token
+            __url = 'http://www.youtube.com/watch?v=' + self.__token
             header['Referer'] = __url
 
             try:
-                header["Host"] = 'm.youtube.com'
+                header["Host"] = 'www.youtube.com'
                 if proxy != None:
                     response = session.get(
                         __url,
