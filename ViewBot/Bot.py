@@ -128,7 +128,7 @@ class Bot:
                 videoLink = __url
 
                 parsed_url = urlparse(url)
-                params = parse_qs(parsed_url.query)
+                params = dict(parse_qs(parsed_url.query))
 
                 request = {
                     'args': params,
