@@ -78,7 +78,7 @@ class Manager:
         t_id = time.time() * 1000
 
         self.__queue[p_id].append(t_id)
-        while self.__critical[p_id] and self.__queue[p_id][0] != t_id:
+        while self.__critical[p_id]:
             time.sleep(random.randint(self.min, self.max))
 
         self.__critical[p_id] = True

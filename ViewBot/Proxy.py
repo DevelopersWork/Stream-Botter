@@ -8,7 +8,7 @@ class Proxy:
 
     __source = {
         "http": [
-            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all",
+            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000",
             "https://www.proxy-list.download/api/v1/get?type=https",
             "https://www.proxy-list.download/api/v1/get?type=http",
             "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=http&LAST_CHECK=60"
@@ -27,7 +27,7 @@ class Proxy:
             "https://raw.githubusercontent.com/mmpx12/proxy-list/master/https.txt"
         ],
         "socks4": [
-            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks4&timeout=10000&country=all&ssl=all&anonymity=all",
+            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks4&timeout=10000",
             "https://www.proxy-list.download/api/v1/get?type=socks4",
             "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks4&LAST_CHECK=60"
         ],
@@ -42,7 +42,7 @@ class Proxy:
             "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/socks4.txt"
         ],
         "socks5": [
-            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks5&timeout=10000&country=all&ssl=all&anonymity=all",
+            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks5&timeout=10000",
             "https://www.proxy-list.download/api/v1/get?type=socks5",
             "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks5&LAST_CHECK=60"
         ],
@@ -125,18 +125,20 @@ class Proxy:
 
     def __formatProxy(self, proxy, proxyType):
         _output = {"http": "", "https": ""}
+        _output = {"http": ""}
+
         if proxyType == "http":
             _output['http'] = "http://"
-            _output['https'] = "https://"
+            # _output['https'] = "https://"
         elif proxyType == "socks4":
             _output['http'] = "socks4://"
-            _output['https'] = "socks4://"
+            # _output['https'] = "socks4://"
         elif proxyType == "socks5":
             _output['http'] = "socks5://"
-            _output['https'] = "socks5://"
+            # _output['https'] = "socks5://"
 
         _output['http'] += proxy
-        _output['https'] += proxy
+        # _output['https'] += proxy
 
         return _output
 

@@ -16,9 +16,9 @@ import logging
 from urllib.parse import urlparse, parse_qs
 import string
 
-TIMEOUT = (15, 60)
-RETRIES = 5
-YT_HEAD_URL = """https://m.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=pz_amMllaL0-PQP3&ver=2&cmt=17723.568&fmt=134&fs=0&rt=9.002&euri&lact=9255&live=dvr&cl=430552675&state=playing&volume=100&cbrand=apple&cbr=Safari%20Mobile&cbrver=10.0.14E304&c=MWEB&cver=2.20220224.07.00&cplayer=UNIPLAYER&cmodel=iphone&cos=iPhone&cosver=10_3_1&cplatform=MOBILE&delay=5&hl=en_US&cr=IN&rtn=19&afmt=140&lio=1645876585.611&idpj=-3&ldpj=-37&rti=9&st=17716.033&et=17723.568&muted=1&docid=VbL4AA7f9D8&ei=nloaYp-HDoL64-EPiOC04As&plid=AAXY7qE5IKru6wdo&of=re3rc5R2DIc7Axbc_lERng&vm=CAEQARgEOjJBS1JhaHdBOEYzYzhBQ1JNTzVGdDI4cWJXVWxHUlFEUDVsWExFSmU0aU9WT1Z5TDJyd2JMQVBta0tESWo5R3dMV2ZFdERURUlXZl9JbVNZOEZkUzVINU9CN0Z5Y0FZdDdXS0tFWGI3YVdvbDlGUGhqTzlFSmpsQlRsc0lISXlrTQ"""
+TIMEOUT = (3.05, 27)
+RETRIES = 3
+YT_HEAD_URL = """http://m.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=KpJi2IHmIrN0FAM3&ver=2&cmt=975.108&fmt=243&fs=0&rt=10.003&euri&lact=10403&live=dvr&cl=430552675&state=playing&volume=100&cbrand=apple&cbr=Safari%20Mobile&cbrver=10.0.14E304&c=MWEB&cver=2.20220224.07.00&cplayer=UNIPLAYER&cmodel=iphone&cos=iPhone&cosver=10_3_1&cplatform=MOBILE&delay=5&hl=en_US&cr=IN&rtn=20&afmt=140&lio=1645929505.811&idpj=-2&ldpj=-10&rti=10&st=967.128&et=975.108&muted=1&docid=YiIBhGWdxL4&ei=7ecaYuz7NfiQg8UPt9q62AY&plid=AAXY9w110frXwCqb&of=_qCnwGk-KWlmu42OAuiBCg&vm=CAEQABgEOjJBS1JhaHdEZTA1VHVzRGRLVUo2T2RBLWNidFA4RnVnVWpTWm1HR1VldkZHQTRMbGJyQWJMQVBta0tESnB4YnJ5cm1aYXR6SHdJSEdVX3I5M29fejY4c3o4LWNDalhqU1A0SXpnckRNMzU2MFFRdWhuZkJtS3ROdU5lakV3MVZ0QQ"""
 
 def randomword(length=16):
    letters = string.ascii_lowercase
@@ -55,15 +55,25 @@ class Bot:
                 "accept-encoding": "gzip, deflate",
                 "accept-language": "en-US,en;q=0.9",
                 "cache-control": "max-age=0",
-                "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1"
+                "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "none",
+                "sec-fetch-user": "?1",
+                "sec-gpc": "1",
+                "upgrade-insecure-requests": "1"
             }
         elif type == "yt_watchtime":
             headers = {
                 "accept": "*/*",
                 "accept-encoding": "gzip, deflate, br",
                 "accept-language": "en-US,en;q=0.9",
-                "referer": "https://m.youtube.com/watch?v={0}".format(id),
-                "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1"
+                "referer": "http://m.youtube.com/watch?v={0}".format(id),
+                "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "sec-gpc": "1"
             }
         else:
             headers = dict()
@@ -95,7 +105,7 @@ class Bot:
         header =  self.__getHeader(self.__token, "yt_video")
         __url = ""
         if self.__platform == "youtube":
-            __url = "https://m.youtube.com/watch?v={0}".format(self.__token)
+            __url = "http://m.youtube.com/watch?v={0}".format(self.__token)
             try:
                 if proxy != None:
                     response = session.get(
@@ -169,7 +179,7 @@ class Bot:
             formatted_proxy = self.__values["proxy"].getRandomProxy()
 
         http = requests.Session()
-        http.mount('https://', self.__adapter)
+        # http.mount('https://', self.__adapter)
         http.mount('http://', self.__adapter)
 
         request_flag = 0
@@ -192,16 +202,16 @@ class Bot:
 
             self.__values["manager"].decrement("request")
             request_flag = 0
-            self.__values["manager"].increment("active")
-            active = 1
             
             origin = datetime.datetime(1970,1,1,0,0,0,0)
             now = datetime.datetime.utcnow()
             start = now - origin
 
-            self.__sleepThread(mn=15, mx=30)
             while not self.__values["manager"].criticalSection():
                 self.__sleepThread(failed = True)
+            self.__values["manager"].increment("active")
+            active = 1
+            self.__sleepThread(mn=1, mx=5)
 
             now = datetime.datetime.utcnow() - origin
 
@@ -231,7 +241,7 @@ class Bot:
             if self.__values["browser"]:
                 self.__values["browser"].open(
                     request['link'], 
-                    formatted_proxy['proxy']['https'], 
+                    formatted_proxy['proxy']['http'], 
                     formatted_proxy['type']
                 )
 
