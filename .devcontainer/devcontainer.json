@@ -7,7 +7,7 @@
 	"containerEnv": {
 		"THREADS": "10", // optmimal value is 500 ~ 1000
 		"TOKEN": "", // video id
-		"PROXY_TYPES": "http", // comma seperated proxy types eg. "http,socks4,socks5"
+		"PROXY_TYPES": "http,socks4,socks5", // comma seperated proxy types eg. "http,socks4,socks5"
 		"TEMP_DIR": "/tmp", // temporary directory location
 		"SPEED": "1" // 1 = normal, 2 = double speed, 3 = triple speed
 	},

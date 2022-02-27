@@ -8,12 +8,12 @@ class Proxy:
 
     __source = {
         "http": [
-            "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=10000&anonymity=elite",
-            "https://www.proxy-list.download/api/v1/get?type=https&anon=elite",
-            "https://www.proxy-list.download/api/v1/get?type=http&anon=elite",
-            "http://pubproxy.com/api/proxy?limit=-1&format=txt&http=true&type=http"
+            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000",
+            "https://www.proxy-list.download/api/v1/get?type=https",
+            "https://www.proxy-list.download/api/v1/get?type=http",
+            "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=http&LAST_CHECK=60"
         ],
-        "old_http": [
+        "http_": [
             "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
             "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=10000&anonymity=elite",
             "https://www.proxy-list.download/api/v1/get?type=https&anon=elite",
@@ -27,12 +27,11 @@ class Proxy:
             "https://raw.githubusercontent.com/mmpx12/proxy-list/master/https.txt"
         ],
         "socks4": [
-            "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/socks4.txt",
-            "https://api.proxyscrape.com/?request=getproxies&proxytype=socks4&timeout=10000",
-            "https://www.proxy-list.download/api/v1/get?type=socks4&anon=elite",
-            "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks4"
+            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks4&timeout=10000",
+            "https://www.proxy-list.download/api/v1/get?type=socks4",
+            "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks4&LAST_CHECK=60"
         ],
-        "old_socks4": [
+        "socks4_": [
             "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/socks4.txt",
             "https://api.proxyscrape.com/?request=getproxies&proxytype=socks4&timeout=10000",
             "https://www.proxy-list.download/api/v1/get?type=socks4&anon=elite",
@@ -43,10 +42,9 @@ class Proxy:
             "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/socks4.txt"
         ],
         "socks5": [
-            "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/socks5.txt",
-            "https://api.proxyscrape.com/?request=getproxies&proxytype=socks5&timeout=10000",
-            "https://www.proxy-list.download/api/v1/get?type=socks5&anon=elite",
-            "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks5"
+            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks5&timeout=10000",
+            "https://www.proxy-list.download/api/v1/get?type=socks5",
+            "http://pubproxy.com/api/proxy?limit=-1&format=txt&type=socks5&LAST_CHECK=60"
         ],
         "dead": [
             "https://gist.githubusercontent.com/DevelopersWork/36d20d90d0bcc8a2db995d7415e254a6/raw/597571ebf26a79b888c19385e072a8fd13a450fc/Not%2520Public%2520Proxies"
@@ -77,6 +75,31 @@ class Proxy:
     def getDir(self):
         return self.__tmp_dir
 
+    def reset(self, verify = False):
+        path = self.__tmp_dir + 'proxies/'
+
+        files = os.listdir(path)
+
+        _data = ""
+        if verify:
+            with open(path + 'dead.txt', 'r') as file:
+                _data += file.read()
+                file.close()
+        
+        for f in files:
+            if f.split('.')[0] in self.__source:
+                if verify and f != 'dead.txt':
+                    with open(path + f) as file:
+                        _data += "\n" + file.read()  
+                else:
+                    os.remove(path + f)
+        
+        if verify:
+            with open(path + 'dead.txt', 'w') as file:
+                file.write(_data)
+                file.close()
+
+
     def __fetchProxies(self):
         self.__proxies = {}
         for proxyType in self.__types:
@@ -102,6 +125,8 @@ class Proxy:
 
     def __formatProxy(self, proxy, proxyType):
         _output = {"http": "", "https": ""}
+        _output = {"http": ""}
+
         if proxyType == "http":
             _output['http'] = "http://"
             # _output['https'] = "https://"

@@ -7,15 +7,17 @@ from io import BytesIO
 
 class ProxyFilter:
 
-    def __init__(self, proxy, output_dir = None, output_file="failed.txt"):
+    def __init__(self, proxy, output_dir = None, output_file="failed.txt", reset = False):
 
+        self.__proxy = None
         if proxy:
             self.__dir = proxy.getDir()
+            self.__proxy = proxy
         else:
             self.__dir = "/tmp/viewbot/"
 
         self.__location = self.__dir + 'proxies/dead.txt'
-
+    
         self.__output_location = output_dir if output_dir else self.__dir + 'proxy_filtered/' 
         os.makedirs(self.__output_location, exist_ok = True)
 
@@ -73,7 +75,10 @@ class ProxyFilter:
             return False
         return True
 
-    def start(self):
+    def start(self, reset = False):
+        if reset and self.__proxy:
+            self.__proxy.reset(reset)
+
         if not os.path.exists(self.__location):
             return False
 
@@ -90,7 +95,12 @@ class ProxyFilter:
             t.join()
 
         os.makedirs(self.__output_location, exist_ok=True)
+
         with open(self.__output_location + self.__output_file, 'w') as file:
+            file.write("\n".join(self.__dead))
+            file.close()
+
+        with open(self.__location, 'w') as file:
             file.write("\n".join(self.__dead))
             file.close()
 

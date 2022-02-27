@@ -2,6 +2,8 @@
 
 A Python script which spams http requests on video streaming platform to increase the live watching count of certain content.
 
+# NOTE: This script isn't working anymore.
+
 ## Requirements
 
 - [Python 3.x](https://www.python.org/)

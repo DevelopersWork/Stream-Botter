@@ -16,10 +16,9 @@ import logging
 from urllib.parse import urlparse, parse_qs
 import string
 
-TIMEOUT = (10, 60)
-RETRIES = 5
-YT_HEAD_URL = """http://s.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=isWmmj2C9Y2vULKF&docid={0}&ver=2&cmt=7334&ei={1}&fmt=133&fs=0&rt=1003&of={2}&euri&lact=4418&live=dvr&cl={3}&state=playing&vm={4}&volume={5}&c=MWEB&cver=2.20200313.03.00&cplayer=UNIPLAYER&cbrand=apple&cbr=Safari%20Mobile&cbrver=12.1.15E148&cmodel=iphone&cos=iPhone&cosver=12_2&cplatform=MOBILE&delay=5&hl=ru&cr=GB&rtn=1303&afmt=140&lio=1556394045.182&idpj=&ldpj=&rti=1003&muted=0&st=7334&et=7634"""
-
+TIMEOUT = (3.05, 27)
+RETRIES = 3
+YT_HEAD_URL = """http://m.youtube.com/api/stats/watchtime?ns=yt&el=detailpage&cpn=KpJi2IHmIrN0FAM3&ver=2&cmt=975.108&fmt=243&fs=0&rt=10.003&euri&lact=10403&live=dvr&cl=430552675&state=playing&volume=100&cbrand=apple&cbr=Safari%20Mobile&cbrver=10.0.14E304&c=MWEB&cver=2.20220224.07.00&cplayer=UNIPLAYER&cmodel=iphone&cos=iPhone&cosver=10_3_1&cplatform=MOBILE&delay=5&hl=en_US&cr=IN&rtn=20&afmt=140&lio=1645929505.811&idpj=-2&ldpj=-10&rti=10&st=967.128&et=975.108&muted=1&docid=YiIBhGWdxL4&ei=7ecaYuz7NfiQg8UPt9q62AY&plid=AAXY9w110frXwCqb&of=_qCnwGk-KWlmu42OAuiBCg&vm=CAEQABgEOjJBS1JhaHdEZTA1VHVzRGRLVUo2T2RBLWNidFA4RnVnVWpTWm1HR1VldkZHQTRMbGJyQWJMQVBta0tESnB4YnJ5cm1aYXR6SHdJSEdVX3I5M29fejY4c3o4LWNDalhqU1A0SXpnckRNMzU2MFFRdWhuZkJtS3ROdU5lakV3MVZ0QQ"""
 
 def randomword(length=16):
    letters = string.ascii_lowercase
@@ -44,43 +43,70 @@ class Bot:
         )
         self.__adapter = HTTPAdapter(max_retries=__retry_strategy)
 
-        self.__ua = UserAgent("windows", requestsPrefix=True)
-
         self.__platform = "youtube"
         self.__token = ""
         self.run = False
 
-    def __getHeader(self, ua):
-        headers = dict()
-        headers["User-Agent"] = ua
-        headers["Accept"] = "*/*"
-        headers["Accept-Language"] = "en-US,en;q=0.5"
-        headers["Accept-Encoding"] = "gzip, deflate"
-        headers["Connection"] = "keep-alive"
-        headers["Pragma"] = "no-cache"
-        headers["Cache-Control"] = "no-cache"
+    def __getHeader(self, id, type = ""):
+
+        if type == "yt_video":
+            headers = {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "accept-encoding": "gzip, deflate",
+                "accept-language": "en-US,en;q=0.9",
+                "cache-control": "max-age=0",
+                "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "none",
+                "sec-fetch-user": "?1",
+                "sec-gpc": "1",
+                "upgrade-insecure-requests": "1"
+            }
+        elif type == "yt_watchtime":
+            headers = {
+                "accept": "*/*",
+                "accept-encoding": "gzip, deflate, br",
+                "accept-language": "en-US,en;q=0.9",
+                "referer": "http://m.youtube.com/watch?v={0}".format(id),
+                "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "sec-gpc": "1"
+            }
+        else:
+            headers = dict()
 
         return headers
 
-    def __getUrl(self,args):
-        url = "http://s.youtube.com/api/stats/watchtime?"
+    def __getUrl(self, args):
+        url = YT_HEAD_URL.split('?')[0] + '?'
+
+        parsed_url = urlparse(YT_HEAD_URL)
+        params = parse_qs(parsed_url.query)
         
-        for k,v in args.items():
-            url += "{0}={1}&".format(k,v)
+        for k,v in params.items():
+            if k in args.keys():
+                if type(args[k]) == 'list':
+                    url += "{0}={1}&".format(k, args[k][0])
+                elif type(args[k]) == 'str':
+                    url += "{0}={1}&".format(k, args[k])
+            else:
+                url += "{0}={1}&".format(k,v[0])
+
+        self.__saveLog(url)
 
         return url
 
-    def __getRequest(self, session, ua, proxy = None):
+    def __getRequest(self, session, proxy = None):
 
         request = {"url": "", "headers": "", "proxies": ""}
-        header = self.__getHeader(ua)
+        header =  self.__getHeader(self.__token, "yt_video")
         __url = ""
         if self.__platform == "youtube":
-            __url = 'http://www.youtube.com/watch?v=' + self.__token
-            header['Referer'] = __url
-
+            __url = "http://m.youtube.com/watch?v={0}".format(self.__token)
             try:
-                header["Host"] = 'www.youtube.com'
                 if proxy != None:
                     response = session.get(
                         __url,
@@ -100,7 +126,13 @@ class Bot:
 
                 html = response.text
 
-                url = html.split('"videostatsWatchtimeUrl":{"baseUrl":"')[1].split('"')[0]
+                with open('template.html', 'w') as file:
+                    # print(html)
+                    file.write(html)
+                    file.close()
+                    # exit()
+
+                url = html.split('"videostatsWatchtimeUrl":')[1].split('"baseUrl":')[1].split('"')[1]
                 url = url.replace('%2C', ',').replace("\/", '/')
                 url = '&'.join(url.split('\\u0026'))
 
@@ -114,61 +146,17 @@ class Bot:
                     watching = 1
 
                 try:    
-                    videoTitle = html.split('"title":{"runs":[{"text":"')[1].split('"')[0]
+                    videoTitle = html.split('"videoDetails":')[1].split('"title":')[1].split('"')[1]
                 except Exception as e:
                     videoTitle = ""
 
                 videoLink = __url
 
                 parsed_url = urlparse(url)
-                params = parse_qs(parsed_url.query)
-
-                rt = random.randint(10, 200)
-                rtn = rt + 300
-                header["Host"] = 'www.youtube.com'
-
-                args = {
-                    "ns" : params["ns"][0],
-                    "el" : params["el"][0],
-                    "cpn" : randomword(),
-                    "docid" : params["docid"][0],
-                    "ver" : "2",
-                    "cmt" : "LOAD BELOW",
-                    "ei" : params["ei"][0],
-                    "fmt" : "243",
-                    "fs" : "0",
-                    "rt" : str(rt),
-                    "of" : params["of"][0],
-                    "euri" : "",
-                    "lact" : str(random.randint(1000, 8000)),
-                    "live" : params["live"][0],
-                    "cl" : params["cl"][0],
-                    "state" : "playing",
-                    "vm" : params["vm"][0],
-                    "volume" : str(random.randint(10, 80)),
-                    "cbr" : "Firefox",
-                    "cbrver" : "83.0",
-                    "c" : "WEB",
-                    "cplayer" : "UNIPLAYER",
-                    "cver" : "2.20201210.01.00",
-                    "cos" : "Windows",
-                    "cosver" : "10.0",
-                    "cplatform" : "DESKTOP",
-                    "delay" : "5",
-                    "hl" : "en_US",
-                    "rtn" : str(rtn),
-                    "aftm" : "140",
-                    "rti" : str(rt),
-                    "muted" : "0",
-                    "st" : str(random.randint(1000, 10000)),
-                    "et" : "LOAD BELOW",
-                    "lio" : "LOAD BELOW"
-                }
+                params = dict(parse_qs(parsed_url.query))
 
                 request = {
-                    # 'url': YT_HEAD_URL.format(self.__token, ei, of, cl, vm, str(int(random.random() * 100 % 80))),
-                    'args': args,
-                    # 'url': self.__getUrl(args),
+                    'args': params,
                     'headers': header,
                     'proxies': proxy,
                     'link': __url,
@@ -186,14 +174,12 @@ class Bot:
 
     def __request(self):
 
-        agent = self.__ua.Random()['User-Agent']
-
         formatted_proxy = None
         if self.__values["proxy"] != None:
             formatted_proxy = self.__values["proxy"].getRandomProxy()
 
         http = requests.Session()
-        http.mount('https://', self.__adapter)
+        # http.mount('https://', self.__adapter)
         http.mount('http://', self.__adapter)
 
         request_flag = 0
@@ -206,28 +192,26 @@ class Bot:
             if formatted_proxy != None:
                 request = self.__getRequest(
                     http,
-                    agent,
                     formatted_proxy["proxy"]
                 )
             else:
                 request = self.__getRequest(
-                    http,
-                    agent
+                    http
                 )
             args = request['args']
 
             self.__values["manager"].decrement("request")
             request_flag = 0
-            self.__values["manager"].increment("active")
-            active = 1
             
             origin = datetime.datetime(1970,1,1,0,0,0,0)
             now = datetime.datetime.utcnow()
             start = now - origin
 
-            self.__sleepThread(mn=20, mx=60)
             while not self.__values["manager"].criticalSection():
                 self.__sleepThread(failed = True)
+            self.__values["manager"].increment("active")
+            active = 1
+            self.__sleepThread(mn=1, mx=5)
 
             now = datetime.datetime.utcnow() - origin
 
@@ -238,19 +222,15 @@ class Bot:
             args['lio'] = str(lio)
             args['cmt'] = str(et)
 
-            response = http.get(
-                self.__getUrl(args).replace("watchtime", "playback"),
-                headers=request['headers'],
-                proxies=request['proxies'],
-                timeout=TIMEOUT
-            )
+            header = self.__getHeader(self.__token, "yt_watchtime")
 
-            if response.status_code != 204:
-                raise Exception('BOT PLAYBACK STATUS IS NOT 204')
+            for e in "cbr=Safari+Mobile&cbrand=apple&cbrver=10.0.14E304&ceng=WebKit&cengver=603.1.30&cmodel=iphone&cos=iPhone&cosver=10_3_1&cplatform=MOBILE".split('&'):
+                k,v = e.split('=')
+                args[k] = v
 
             response = http.get(
                 self.__getUrl(args),
-                headers=request['headers'],
+                headers=header,
                 proxies=request['proxies'],
                 timeout=TIMEOUT
             )
@@ -261,7 +241,7 @@ class Bot:
             if self.__values["browser"]:
                 self.__values["browser"].open(
                     request['link'], 
-                    formatted_proxy['proxy']['https'], 
+                    formatted_proxy['proxy']['http'], 
                     formatted_proxy['type']
                 )
 
@@ -326,6 +306,7 @@ class Bot:
         finally:
             if active == 1:
                 self.__values["manager"].decrement("active")
+                self.__values["manager"].increment("failed")
 
             if request_flag == 1:
                 self.__values["manager"].decrement("request")
